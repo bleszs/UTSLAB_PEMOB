@@ -1,12 +1,12 @@
 {
-    "name": "quizora",
-    "short_name": "quizora",
+    "name": "Quizora",
+    "short_name": "Quizora",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#FAF8FF",
+    "theme_color": "#7338EA",
+    "description": "Kuis pengetahuan umum dengan skor personal dan pembahasan jawaban.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

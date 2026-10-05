@@ -5,7 +5,13 @@ class QuizArtwork extends StatelessWidget {
   final bool trophy;
   final double height;
   @override
-  Widget build(BuildContext context) => ExcludeSemantics(child: SizedBox(height: height,
-    child: Image.asset(trophy ? 'assets/images/trophy.png' : 'assets/images/education.png', fit: BoxFit.contain),
-  ));
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: SizedBox(
+      height: height,
+      child: Image.asset(
+        trophy ? 'assets/images/trophy.png' : 'assets/images/education.png',
+        fit: BoxFit.contain,
+      ),
+    ),
+  );
 }

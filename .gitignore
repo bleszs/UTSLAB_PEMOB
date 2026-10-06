@@ -32,6 +32,8 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+/.gradle-local/
+/.font-tools/
 
 # Symbolication related
 app.*.symbols

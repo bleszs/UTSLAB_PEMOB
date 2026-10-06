@@ -42,8 +42,9 @@ class QuizController extends ChangeNotifier {
 
   void start(String name) {
     final cleaned = name.trim();
-    if (cleaned.isEmpty || cleaned.runes.length > 30)
+    if (cleaned.isEmpty || cleaned.runes.length > 30) {
       throw ArgumentError('Nama harus berisi 1–30 karakter.');
+    }
     _name = cleaned;
     _index = 0;
     _completed = false;
@@ -53,8 +54,9 @@ class QuizController extends ChangeNotifier {
 
   void select(int option) {
     if (!hasSession) return;
-    if (option < 0 || option >= current.options.length)
+    if (option < 0 || option >= current.options.length) {
       throw RangeError.index(option, current.options);
+    }
     _answers[_index] = option;
     notifyListeners();
   }

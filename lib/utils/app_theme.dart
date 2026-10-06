@@ -36,53 +36,55 @@ abstract final class AppTheme {
     );
     return base.copyWith(
       scaffoldBackgroundColor: dark ? AppColors.navy : const Color(0xFFFAF8FF),
-      textTheme: base.textTheme.copyWith(
-        displayLarge: TextStyle(
-          fontSize: 72,
-          fontWeight: FontWeight.w900,
-          height: 1.05,
-          color: scheme.onSurface,
-        ),
-        headlineLarge: TextStyle(
-          fontSize: 36,
-          fontWeight: FontWeight.w900,
-          height: 1.18,
-          color: scheme.onSurface,
-        ),
-        headlineMedium: TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.w800,
-          height: 1.25,
-          color: scheme.onSurface,
-        ),
-        titleLarge: TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.w800,
-          height: 1.3,
-          color: scheme.onSurface,
-        ),
-        titleMedium: TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w700,
-          height: 1.4,
-          color: scheme.onSurface,
-        ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          height: 1.5,
-          color: scheme.onSurface,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          height: 1.5,
-          color: scheme.onSurfaceVariant,
-        ),
-        labelLarge: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w800,
-          color: scheme.onSurface,
-        ),
-      ),
+      textTheme: base.textTheme
+          .copyWith(
+            displayLarge: TextStyle(
+              fontSize: 72,
+              fontWeight: FontWeight.w900,
+              height: 1.05,
+              color: scheme.onSurface,
+            ),
+            headlineLarge: TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.w900,
+              height: 1.18,
+              color: scheme.onSurface,
+            ),
+            headlineMedium: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              height: 1.25,
+              color: scheme.onSurface,
+            ),
+            titleLarge: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              height: 1.3,
+              color: scheme.onSurface,
+            ),
+            titleMedium: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              height: 1.4,
+              color: scheme.onSurface,
+            ),
+            bodyLarge: TextStyle(
+              fontSize: 16,
+              height: 1.5,
+              color: scheme.onSurface,
+            ),
+            bodyMedium: TextStyle(
+              fontSize: 14,
+              height: 1.5,
+              color: scheme.onSurfaceVariant,
+            ),
+            labelLarge: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: scheme.onSurface,
+            ),
+          )
+          .apply(fontFamily: 'Nunito'),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: scheme.surface,

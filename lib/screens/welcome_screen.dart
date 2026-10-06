@@ -129,10 +129,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     counterText: '',
                   ),
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty)
+                    if (value == null || value.trim().isEmpty) {
                       return 'Isi nama dulu, lalu mulai kuis.';
-                    if (value.trim().runes.length > 30)
+                    }
+                    if (value.trim().runes.length > 30) {
                       return 'Gunakan nama maksimal 30 karakter.';
+                    }
                     return null;
                   },
                   onFieldSubmitted: (_) => _openQuiz(),

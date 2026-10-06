@@ -1,4 +1,4 @@
-param([string]$Label, [ValidateSet('A','B','C','D')][string]$Choice, [switch]$NameInput, [switch]$Inspect)
+param([string]$Label, [ValidateSet('A','B','C','D')][string]$Choice, [switch]$NameInput, [switch]$Inspect, [ValidateRange(0,30)][int]$Index = 0)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'env_d.ps1')
 $taskAdb = Join-Path $env:ANDROID_HOME 'platform-tools\adb.exe'
@@ -17,7 +17,7 @@ $taskNode = $taskUi.SelectNodes('//node') | Where-Object {
     if ($NameInput) { $_.class -eq 'android.widget.EditText' }
     elseif ($Choice) { $_.'content-desc' -match "^Pilihan ${Choice}:" }
     else { $_.'content-desc' -eq $Label -or $_.text -eq $Label }
-} | Select-Object -First 1
+} | Select-Object -Skip $Index -First 1
 if (-not $taskNode) { throw "Kontrol belum terlihat: $Label" }
 if ($Inspect) { $taskNode | Select-Object 'content-desc',selected,bounds; exit 0 }
 $taskBounds = [regex]::Match($taskNode.bounds, '^\[(\d+),(\d+)\]\[(\d+),(\d+)\]$')

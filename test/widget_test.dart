@@ -1,112 +1,220 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quizora/main.dart';
+import 'package:quizora/controllers/quiz_controller.dart';
 import 'package:quizora/data/questions.dart';
-import 'package:quizora/widgets/option_card.dart';
+import 'package:quizora/models/question.dart';
+import 'package:quizora/widgets/puzzle_interactor.dart';
+
+Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+  await tester.ensureVisible(finder);
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+Future<void> solveVisible(WidgetTester tester) async {
+  final quiz = tester
+      .widget<PuzzleInteractor>(find.byType(PuzzleInteractor))
+      .quiz;
+  final q = quiz.current;
+  switch (q.type) {
+    case QuestionType.sequence:
+      for (var target = 0; target < q.answerKey.length; target++) {
+        final id = q.answerKey[target];
+        final label = q.items.firstWhere((i) => i.id == id).label;
+        while (quiz.answer.indexOf(id) > target) {
+          await tapVisible(tester, find.byTooltip('Naikkan $label'));
+        }
+      }
+    case QuestionType.matching:
+    case QuestionType.categorize:
+      for (var i = 0; i < q.items.length; i++) {
+        final label = q.targets.firstWhere((t) => t.id == q.answerKey[i]).label;
+        await tapVisible(tester, find.widgetWithText(ChoiceChip, label).at(i));
+      }
+    case QuestionType.codeBuilder:
+      for (final id in q.answerKey) {
+        await tapVisible(tester, find.widgetWithText(ActionChip, id));
+      }
+    case QuestionType.hotspot:
+    case QuestionType.scenario:
+    case QuestionType.multiSelect:
+      for (final id in q.answerKey) {
+        await tapVisible(
+          tester,
+          find.text(q.items.firstWhere((item) => item.id == id).label),
+        );
+      }
+  }
+  expect(quiz.canSubmit, true);
+}
+
+void setSize(WidgetTester tester, Size value) {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = value;
+}
 
 void main() {
-  Future<void> tapVisible(WidgetTester tester, Finder finder) async {
-    await tester.ensureVisible(finder);
-    await tester.tap(finder);
+  testWidgets('long-press token drag fills a slot and keeps token IDs unique', (
+    tester,
+  ) async {
+    setSize(tester, const Size(390, 844));
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final quiz = QuizController(questions: [questions[8]])
+      ..setPlayer('Ayu')
+      ..startMission();
+    addTearDown(quiz.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ListenableBuilder(
+            listenable: quiz,
+            builder: (context, _) => PuzzleInteractor(quiz: quiz),
+          ),
+        ),
+      ),
+    );
+    final token = find.widgetWithText(ActionChip, '2');
+    final slot = find.byType(OutlinedButton).first;
+    final gesture = await tester.startGesture(tester.getCenter(token));
+    await tester.pump(const Duration(milliseconds: 600));
+    await gesture.moveTo(tester.getCenter(slot));
+    await tester.pump();
+    await gesture.up();
     await tester.pumpAndSettle();
-  }
-
-  void size(WidgetTester tester, Size value) {
-    tester.view.devicePixelRatio = 1;
-    tester.view.physicalSize = value;
-  }
-
-  tearDown(() {});
-  testWidgets('full quiz, review and replay flow; empty names are rejected', (
-    tester,
-  ) async {
-    size(tester, const Size(390, 844));
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(const QuizoraApp());
-    await tapVisible(tester, find.text('Mulai Kuis'));
-    expect(find.text('Isi nama dulu, lalu mulai kuis.'), findsOneWidget);
-    await tester.enterText(find.byKey(const Key('name_input')), 'Ayu');
-    await tapVisible(tester, find.text('Mulai Kuis'));
-    expect(find.text('Soal 1 dari 10'), findsOneWidget);
-    expect(
-      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-      isNull,
-    );
-    for (var i = 0; i < questions.length; i++) {
-      await tapVisible(
-        tester,
-        find.byType(OptionCard).at(questions[i].correctIndex),
-      );
-      await tapVisible(
-        tester,
-        find.text(i == 9 ? 'Lihat Hasil' : 'Selanjutnya'),
-      );
-    }
-    expect(find.text('Hebat, Ayu!'), findsOneWidget);
-    expect(find.text('100'), findsOneWidget);
-    expect(find.text('10 dari 10 jawaban benar'), findsOneWidget);
-    await tapVisible(tester, find.text('Lihat Pembahasan'));
-    expect(find.text('Soal 1 · Benar'), findsOneWidget);
-    await tapVisible(tester, find.byTooltip('Kembali'));
-    await tapVisible(tester, find.text('Main Lagi'));
-    expect(find.byKey(const Key('name_input')), findsOneWidget);
-    expect(
-      tester
-          .widget<TextFormField>(find.byKey(const Key('name_input')))
-          .controller!
-          .text,
-      isEmpty,
-    );
-    expect(find.text('Isi nama dulu, lalu mulai kuis.'), findsNothing);
-    expect(find.text('Lanjutkan kuis sebelumnya'), findsNothing);
-    expect(tester.takeException(), isNull);
-  });
-  testWidgets('rotation, theme and back navigation preserve selection', (
-    tester,
-  ) async {
-    size(tester, const Size(320, 568));
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(const QuizoraApp());
-    await tester.enterText(
-      find.byKey(const Key('name_input')),
-      'Nama pengguna panjang',
-    );
-    await tapVisible(tester, find.text('Mulai Kuis'));
-    await tapVisible(tester, find.text('Mars'));
-    size(tester, const Size(844, 390));
+    expect(quiz.answer, ['2', '', '']);
+    await tester.tap(find.widgetWithText(ActionChip, '4'));
     await tester.pumpAndSettle();
-    expect(
-      tester.widget<OptionCard>(find.byType(OptionCard).at(1)).selected,
-      true,
-    );
-    await tapVisible(tester, find.byTooltip('Aktifkan mode gelap'));
-    expect(
-      tester.widget<OptionCard>(find.byType(OptionCard).at(1)).selected,
-      true,
-    );
-    await tapVisible(tester, find.text('Selanjutnya'));
-    await tapVisible(tester, find.byTooltip('Kembali'));
-    expect(find.text('Soal 1 dari 10'), findsOneWidget);
-    expect(
-      tester.widget<OptionCard>(find.byType(OptionCard).at(1)).selected,
-      true,
-    );
+    expect(quiz.answer, ['2', '4', '']);
     expect(tester.takeException(), isNull);
   });
-  testWidgets('small landscape remains scrollable with enlarged text', (
-    tester,
-  ) async {
-    size(tester, const Size(568, 320));
-    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-    await tester.pumpWidget(const QuizoraApp());
-    await tester.enterText(find.byKey(const Key('name_input')), 'Ayu');
-    await tapVisible(tester, find.text('Mulai Kuis'));
-    await tapVisible(tester, find.text('Mars'));
-    expect(tester.takeException(), isNull);
-  });
+  testWidgets(
+    'all seven interactions complete marathon, review and clean replay',
+    (tester) async {
+      setSize(tester, const Size(390, 844));
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(const QuizoraApp());
+      await tapVisible(tester, find.text('Pilih Misi'));
+      expect(find.text('Isi nama dulu, lalu pilih misi.'), findsOneWidget);
+      await tester.enterText(find.byKey(const Key('name_input')), 'Ayu');
+      await tapVisible(tester, find.text('Pilih Misi'));
+      await tapVisible(tester, find.text('Maraton 12 Puzzle'));
+      for (var i = 0; i < 12; i++) {
+        await solveVisible(tester);
+        await tapVisible(tester, find.text('Kirim Jawaban'));
+        expect(find.text('Buktinya cocok!'), findsOneWidget);
+        await tapVisible(
+          tester,
+          find.text(i == 11 ? 'Lihat Hasil' : 'Puzzle Berikutnya'),
+        );
+      }
+      expect(find.text('100%'), findsOneWidget);
+      expect(find.text('1470'), findsOneWidget);
+      await tapVisible(tester, find.text('Lihat Pembahasan'));
+      expect(find.text('Alur file yang tertukar'), findsOneWidget);
+      await tapVisible(tester, find.byTooltip('Kembali'));
+      await tapVisible(tester, find.text('Main Lagi'));
+      expect(
+        tester
+            .widget<TextFormField>(find.byKey(const Key('name_input')))
+            .controller!
+            .text,
+        isEmpty,
+      );
+      expect(find.text('Isi nama dulu, lalu pilih misi.'), findsNothing);
+      expect(find.text('Lanjutkan misi sebelumnya'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+  testWidgets(
+    'code tokens survive landscape, theme and leaving/resuming a mission',
+    (tester) async {
+      setSize(tester, const Size(390, 844));
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(const QuizoraApp());
+      await tester.enterText(find.byKey(const Key('name_input')), 'Ayu');
+      await tapVisible(tester, find.text('Pilih Misi'));
+      await tapVisible(tester, find.text('Kunci Ruang Lab'));
+      await tapVisible(tester, find.widgetWithText(ActionChip, '2'));
+      final quiz = tester
+          .widget<PuzzleInteractor>(find.byType(PuzzleInteractor))
+          .quiz;
+      setSize(tester, const Size(844, 390));
+      await tester.pumpAndSettle();
+      expect(quiz.answer, ['2', '', '']);
+      await tapVisible(tester, find.byTooltip('Aktifkan mode gelap'));
+      expect(quiz.answer, ['2', '', '']);
+      await tapVisible(tester, find.byTooltip('Kembali'));
+      await tapVisible(tester, find.text('Lanjutkan misi sebelumnya'));
+      expect(quiz.answer, ['2', '', '']);
+      await tapVisible(tester, find.widgetWithText(ActionChip, '4'));
+      await tapVisible(tester, find.widgetWithText(ActionChip, '3'));
+      await tapVisible(tester, find.text('Buka Petunjuk'));
+      await tapVisible(tester, find.text('Kirim Jawaban'));
+      expect(quiz.attempt!.points, 70);
+      expect(tester.takeException(), isNull);
+    },
+  );
+  testWidgets(
+    'small landscape and enlarged text support every renderer without overflow',
+    (tester) async {
+      setSize(tester, const Size(568, 320));
+      tester.platformDispatcher.textScaleFactorTestValue = 1.5;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(const QuizoraApp());
+      await tester.enterText(
+        find.byKey(const Key('name_input')),
+        'Nama cukup panjang',
+      );
+      await tapVisible(tester, find.text('Pilih Misi'));
+      await tapVisible(tester, find.text('Maraton 12 Puzzle'));
+      for (var i = 0; i < 12; i++) {
+        await solveVisible(tester);
+        expect(tester.takeException(), isNull);
+        await tapVisible(tester, find.text('Kirim Jawaban'));
+        await tapVisible(
+          tester,
+          find.text(i == 11 ? 'Lihat Hasil' : 'Puzzle Berikutnya'),
+        );
+      }
+      expect(tester.takeException(), isNull);
+    },
+  );
+  testWidgets(
+    'wrong answer exposes explanation and practice only contains that puzzle',
+    (tester) async {
+      setSize(tester, const Size(390, 844));
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(const QuizoraApp());
+      await tester.enterText(find.byKey(const Key('name_input')), 'Bela');
+      await tapVisible(tester, find.text('Pilih Misi'));
+      await tapVisible(tester, find.text('Selamatkan Presentasi'));
+      await tapVisible(tester, find.text('Kirim Jawaban'));
+      expect(find.text('Belum tepat'), findsOneWidget);
+      await tapVisible(tester, find.text('Puzzle Berikutnya'));
+      for (var i = 0; i < 3; i++) {
+        await solveVisible(tester);
+        await tapVisible(tester, find.text('Kirim Jawaban'));
+        await tapVisible(
+          tester,
+          find.text(i == 2 ? 'Lihat Hasil' : 'Puzzle Berikutnya'),
+        );
+      }
+      expect(find.text('75%'), findsOneWidget);
+      await tapVisible(tester, find.text('Latih yang Belum Tepat'));
+      expect(find.text('Puzzle 1 / 1'), findsOneWidget);
+      await solveVisible(tester);
+      await tapVisible(tester, find.text('Kirim Jawaban'));
+      await tapVisible(tester, find.text('Lihat Hasil'));
+      expect(find.text('100%'), findsOneWidget);
+      expect(find.text('100'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

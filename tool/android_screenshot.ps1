@@ -1,13 +1,14 @@
 param(
     [ValidatePattern('^[A-Za-z0-9_.:-]+$')][string]$Serial = 'emulator-5554',
-    [Parameter(Mandatory=$true)][ValidatePattern('^[A-Za-z0-9_-]+$')][string]$Name
+    [Parameter(Mandatory=$true)][ValidatePattern('^[A-Za-z0-9_-]+$')][string]$Name,
+    [switch]$Quest
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'env_d.ps1')
 $taskAdb = Join-Path $env:ANDROID_HOME 'platform-tools\adb.exe'
 # Allow navigation, theme transitions and asset decoding to settle.
 Start-Sleep -Milliseconds 1500
-$taskCaptureDir = Join-Path $taskProjectRoot 'docs\screenshots\android'
+$taskCaptureDir = if ($Quest) { Join-Path $taskProjectRoot 'docs\screenshots\quest\android' } else { Join-Path $taskProjectRoot 'docs\screenshots\android' }
 New-Item -ItemType Directory -Force -Path $taskCaptureDir | Out-Null
 $taskOutput = Join-Path $taskCaptureDir "$Name.png"
 $taskProcessInfo = [System.Diagnostics.ProcessStartInfo]::new()

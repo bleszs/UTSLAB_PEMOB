@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../controllers/quiz_controller.dart';
+import '../models/question.dart';
 import '../widgets/app_header.dart';
 import '../widgets/custom_primary_button.dart';
-import '../widgets/option_card.dart';
+import '../widgets/puzzle_interactor.dart';
 import '../widgets/responsive_page.dart';
 import 'result_screen.dart';
 
@@ -19,15 +21,35 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  void _back() {
-    if (widget.quiz.index > 0) {
-      widget.quiz.previous();
-    } else {
-      Navigator.of(context).pop();
-    }
+  String? _heardAttempt;
+  @override
+  void initState() {
+    super.initState();
+    widget.quiz.setNavigationPaused(false);
+    widget.quiz.addListener(_feedback);
   }
 
-  void _next() {
+  void _feedback() {
+    final attempt = widget.quiz.attempt;
+    final key = '${widget.quiz.sessionNumber}-${widget.quiz.current.id}';
+    if (attempt == null || key == _heardAttempt) return;
+    _heardAttempt = key;
+    if (attempt.correct) {
+      HapticFeedback.lightImpact();
+    } else {
+      HapticFeedback.mediumImpact();
+    }
+    if (widget.quiz.soundEnabled) SystemSound.play(SystemSoundType.click);
+  }
+
+  @override
+  void dispose() {
+    widget.quiz.removeListener(_feedback);
+    widget.quiz.setNavigationPaused(true);
+    super.dispose();
+  }
+
+  void _advance() {
     if (!widget.quiz.next()) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
@@ -45,127 +67,234 @@ class _QuizScreenState extends State<QuizScreen> {
     builder: (context, _) {
       final quiz = widget.quiz;
       final theme = Theme.of(context);
-      final scheme = theme.colorScheme;
-      return PopScope(
-        canPop: quiz.index == 0,
-        onPopInvokedWithResult: (didPop, _) {
-          if (!didPop) quiz.previous();
-        },
-        child: ResponsivePage(
-          header: AppHeader(
-            dark: theme.brightness == Brightness.dark,
-            onToggleTheme: widget.onToggleTheme,
-            onBack: _back,
-            title: 'Pengetahuan umum',
-          ),
-          footer: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 560),
-            child: CustomPrimaryButton(
-              label: quiz.isLast ? 'Lihat Hasil' : 'Selanjutnya',
-              icon: quiz.isLast
-                  ? Icons.emoji_events_outlined
-                  : Icons.arrow_forward_rounded,
-              onPressed: quiz.selected == null ? null : _next,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
+      return ResponsivePage(
+        header: AppHeader(
+          dark: theme.brightness == Brightness.dark,
+          onToggleTheme: widget.onToggleTheme,
+          onBack: () => Navigator.of(context).pop(),
+          title: 'Quizora Quest',
+        ),
+        footer: CustomPrimaryButton(
+          label: quiz.submitted
+              ? (quiz.isLast ? 'Lihat Hasil' : 'Puzzle Berikutnya')
+              : 'Kirim Jawaban',
+          icon: quiz.submitted
+              ? Icons.arrow_forward_rounded
+              : Icons.check_rounded,
+          onPressed: quiz.submitted
+              ? _advance
+              : (quiz.canSubmit ? () => quiz.submit() : null),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: 20,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  'Puzzle ${quiz.index + 1} / ${quiz.total}',
+                  style: theme.textTheme.titleMedium,
+                ),
+                Text('${quiz.points} poin', style: theme.textTheme.titleMedium),
+                Text('Combo ${quiz.streak}', style: theme.textTheme.bodyMedium),
+                if (quiz.mode == GameMode.challenge)
+                  Semantics(
+                    liveRegion: quiz.remainingSeconds <= 10,
+                    label: 'Sisa waktu ${quiz.remainingSeconds} detik',
                     child: Text(
-                      'Soal ${quiz.index + 1} dari ${quiz.total}',
-                      style: theme.textTheme.titleMedium,
+                      '${quiz.remainingSeconds} detik',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: quiz.remainingSeconds <= 10
+                            ? theme.colorScheme.error
+                            : theme.colorScheme.primary,
+                      ),
                     ),
                   ),
-                  Text(
-                    '${quiz.answered} terjawab',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Semantics(
-                label: 'Progress jawaban',
-                value: '${quiz.answered} dari ${quiz.total}',
-                child: LinearProgressIndicator(value: quiz.progress),
-              ),
-              const SizedBox(height: 32),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final question = Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        quiz.current.text,
-                        key: ValueKey(quiz.current.id),
-                        style: theme.textTheme.headlineMedium,
+              ],
+            ),
+            const SizedBox(height: 14),
+            LinearProgressIndicator(
+              value: quiz.progress,
+              semanticsLabel: 'Progress misi',
+              semanticsValue: '${quiz.answered} dari ${quiz.total}',
+            ),
+            const SizedBox(height: 28),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final story = Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      quiz.current.title,
+                      style: theme.textTheme.headlineMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      quiz.current.context,
+                      style: theme.textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      quiz.current.instruction,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.primary,
                       ),
-                      const SizedBox(height: 16),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '${quiz.sessionTitle} · ${quiz.current.typeLabel}',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        TextButton.icon(
+                          onPressed: quiz.submitted || quiz.usedHint
+                              ? null
+                              : quiz.useHint,
+                          icon: const Icon(Icons.lightbulb_outline_rounded),
+                          label: Text(
+                            quiz.usedHint
+                                ? 'Petunjuk digunakan'
+                                : 'Buka Petunjuk',
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: quiz.soundEnabled
+                              ? 'Matikan suara'
+                              : 'Aktifkan suara',
+                          onPressed: quiz.toggleSound,
+                          icon: Icon(
+                            quiz.soundEnabled
+                                ? Icons.volume_up_outlined
+                                : Icons.volume_off_outlined,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (quiz.usedHint) ...[
+                      Text(quiz.current.hint, style: theme.textTheme.bodyLarge),
+                      const SizedBox(height: 8),
                       Text(
-                        'Pilih satu jawaban yang paling tepat.',
+                        'Jawaban benar dengan bantuan: 70 poin. Combo dimulai kembali.',
                         style: theme.textTheme.bodyMedium,
                       ),
                     ],
-                  );
-                  final options = Column(
-                    children: [
-                      for (var i = 0; i < quiz.current.options.length; i++) ...[
-                        OptionCard(
-                          key: ValueKey('${quiz.current.id}-$i'),
-                          index: i,
-                          text: quiz.current.options[i],
-                          selected: quiz.selected == i,
-                          onTap: () => quiz.select(i),
-                        ),
-                        if (i < quiz.current.options.length - 1)
-                          const SizedBox(height: 12),
-                      ],
-                    ],
-                  );
-                  return constraints.maxWidth >= 720
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: question),
-                            const SizedBox(width: 48),
-                            Expanded(child: options),
-                          ],
+                  ],
+                );
+                final work = AnimatedSwitcher(
+                  duration: MediaQuery.disableAnimationsOf(context)
+                      ? Duration.zero
+                      : const Duration(milliseconds: 240),
+                  child: quiz.submitted
+                      ? PuzzleFeedback(
+                          key: ValueKey('feedback-${quiz.current.id}'),
+                          quiz: quiz,
                         )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            question,
-                            const SizedBox(height: 28),
-                            options,
-                          ],
-                        );
-                },
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    size: 16,
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Jawaban bisa diubah sebelum kuis selesai.',
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+                      : PuzzleInteractor(
+                          key: ValueKey('work-${quiz.current.id}'),
+                          quiz: quiz,
+                        ),
+                );
+                return constraints.maxWidth >= 720
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: story),
+                          const SizedBox(width: 40),
+                          Expanded(child: work),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [story, const SizedBox(height: 24), work],
+                      );
+              },
+            ),
+            const SizedBox(height: 24),
+            Text(
+              quiz.submitted
+                  ? 'Jawaban terkirim dan terkunci. Baca alasannya sebelum lanjut.'
+                  : 'Jawaban dapat diubah sampai kamu menekan Kirim Jawaban.',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 24),
+          ],
         ),
       );
     },
   );
+}
+
+class PuzzleFeedback extends StatelessWidget {
+  const PuzzleFeedback({super.key, required this.quiz});
+  final QuizController quiz;
+  @override
+  Widget build(BuildContext context) {
+    final attempt = quiz.attempt!;
+    final theme = Theme.of(context);
+    return Semantics(
+      liveRegion: true,
+      child: Container(
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          color: attempt.correct
+              ? theme.colorScheme.primaryContainer
+              : theme.colorScheme.errorContainer,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: DefaultTextStyle.merge(
+          style: TextStyle(
+            color: attempt.correct
+                ? theme.colorScheme.onPrimaryContainer
+                : theme.colorScheme.onErrorContainer,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                attempt.correct
+                    ? Icons.check_circle_outline_rounded
+                    : (attempt.timedOut
+                          ? Icons.timer_off_outlined
+                          : Icons.search_rounded),
+                size: 40,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                attempt.correct
+                    ? 'Buktinya cocok!'
+                    : (attempt.timedOut ? 'Waktu habis' : 'Belum tepat'),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: attempt.correct
+                      ? theme.colorScheme.onPrimaryContainer
+                      : theme.colorScheme.onErrorContainer,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text('+${attempt.points} poin'),
+              if (attempt.comboBonus > 0)
+                Text('Bonus combo +${attempt.comboBonus}'),
+              if (attempt.timeBonus > 0)
+                Text('Bonus waktu +${attempt.timeBonus}'),
+              const SizedBox(height: 20),
+              const Text('Jawabanmu:'),
+              Text(quiz.current.describe(attempt.answer)),
+              if (!attempt.correct) ...[
+                const SizedBox(height: 14),
+                const Text('Penyelesaian yang benar:'),
+                Text(quiz.current.describe(quiz.current.answerKey)),
+              ],
+              const SizedBox(height: 20),
+              Text(quiz.current.explanation),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

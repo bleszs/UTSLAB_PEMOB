@@ -12,9 +12,20 @@ class QuizoraApp extends StatefulWidget {
   State<QuizoraApp> createState() => _QuizoraAppState();
 }
 
-class _QuizoraAppState extends State<QuizoraApp> {
+class _QuizoraAppState extends State<QuizoraApp> with WidgetsBindingObserver {
   final QuizController _quiz = QuizController(questions: questions);
   final ValueNotifier<ThemeMode> _theme = ValueNotifier(ThemeMode.system);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _quiz.setLifecyclePaused(state != AppLifecycleState.resumed);
+  }
+
   void _toggleTheme() {
     final dark =
         _theme.value == ThemeMode.dark ||
@@ -26,6 +37,7 @@ class _QuizoraAppState extends State<QuizoraApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _quiz.dispose();
     _theme.dispose();
     super.dispose();
@@ -35,7 +47,7 @@ class _QuizoraAppState extends State<QuizoraApp> {
   Widget build(BuildContext context) => ValueListenableBuilder<ThemeMode>(
     valueListenable: _theme,
     builder: (context, mode, _) => MaterialApp(
-      title: 'Quizora',
+      title: 'Quizora Quest',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.build(Brightness.light),
       darkTheme: AppTheme.build(Brightness.dark),

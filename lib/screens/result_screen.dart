@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../controllers/quiz_controller.dart';
-import '../utils/app_theme.dart';
 import '../widgets/app_header.dart';
 import '../widgets/custom_primary_button.dart';
 import '../widgets/quiz_artwork.dart';
 import '../widgets/responsive_page.dart';
+import '../utils/app_theme.dart';
+import 'quiz_screen.dart';
 import 'review_screen.dart';
 
 class ResultScreen extends StatelessWidget {
@@ -18,138 +19,137 @@ class ResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final perfect = quiz.correct == quiz.total;
-    final praise = quiz.score >= 70 ? 'Hebat' : 'Terima kasih sudah mencoba';
     return ResponsivePage(
       header: AppHeader(
         dark: theme.brightness == Brightness.dark,
         onToggleTheme: onToggleTheme,
-        title: 'Hasil kuis',
+        title: 'Misi selesai',
       ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 640),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8, bottom: 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '$praise, ${quiz.name}!',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  perfect
-                      ? 'Sempurna! Semua jawabanmu benar.'
-                      : 'Setiap tantangan membawa pengetahuan baru.',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 8),
-                const QuizArtwork(trophy: true, height: 195),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(28),
-                  decoration: BoxDecoration(
-                    color: AppColors.purple,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Column(
-                    children: [
-                      Semantics(
-                        label: 'Skor akhir ${quiz.score} dari 100',
-                        child: ExcludeSemantics(
-                          child: Wrap(
-                            alignment: WrapAlignment.center,
-                            crossAxisAlignment: WrapCrossAlignment.end,
-                            children: [
-                              Text(
-                                '${quiz.score}',
-                                style: theme.textTheme.displayLarge?.copyWith(
-                                  color: AppColors.yellow,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  bottom: 8,
-                                  left: 6,
-                                ),
-                                child: Text(
-                                  '/ 100',
-                                  style: theme.textTheme.titleLarge?.copyWith(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        '${quiz.correct} dari ${quiz.total} jawaban benar',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 22),
-                      const Divider(color: Color(0xFFAA7AFF)),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _Statistic(
-                              value: '${quiz.total}',
-                              label: 'Soal',
-                              icon: Icons.layers_outlined,
-                            ),
-                          ),
-                          Expanded(
-                            child: _Statistic(
-                              value: '${quiz.correct}',
-                              label: 'Benar',
-                              icon: Icons.check_circle_outline_rounded,
-                            ),
-                          ),
-                          Expanded(
-                            child: _Statistic(
-                              value: '${quiz.total - quiz.correct}',
-                              label: 'Salah',
-                              icon: Icons.cancel_outlined,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 20),
+              Icon(
+                switch (quiz.avatar) {
+                  'detective' => Icons.search_rounded,
+                  'inventor' => Icons.lightbulb_outline_rounded,
+                  _ => Icons.explore_outlined,
+                },
+                color: theme.colorScheme.primary,
+                size: 32,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Misi tuntas, ${quiz.name}!',
+                style: theme.textTheme.headlineMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                quiz.sessionTitle,
+                style: theme.textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+              if (quiz.practice)
+                const Padding(
+                  padding: EdgeInsets.only(top: 8),
+                  child: Text(
+                    'Hasil latihan baru · terpisah dari sesi sebelumnya',
                   ),
                 ),
-                const SizedBox(height: 24),
-                CustomPrimaryButton(
-                  label: 'Main Lagi',
-                  icon: Icons.replay_rounded,
-                  onPressed: () {
-                    quiz.reset();
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  },
+              const QuizArtwork(trophy: true, height: 170),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.purple,
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                const SizedBox(height: 10),
-                TextButton.icon(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => ReviewScreen(
-                        quiz: quiz,
-                        onToggleTheme: onToggleTheme,
+                child: Column(
+                  children: [
+                    Text(
+                      '${quiz.score}%',
+                      style: theme.textTheme.displayLarge?.copyWith(
+                        color: AppColors.yellow,
                       ),
                     ),
-                  ),
-                  icon: const Icon(Icons.fact_check_outlined),
-                  label: const Text('Lihat Pembahasan'),
+                    const Text(
+                      'Akurasi percobaan pertama',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${quiz.correct} dari ${quiz.total} puzzle benar',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Divider(color: Color(0xFFAA7AFF)),
+                    const SizedBox(height: 20),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 28,
+                      runSpacing: 16,
+                      children: [
+                        _Stat('${quiz.points}', 'Poin permainan'),
+                        _Stat('${quiz.bestStreak}', 'Combo terbaik'),
+                        _Stat('${quiz.hintCount}', 'Petunjuk'),
+                      ],
+                    ),
+                  ],
                 ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                quiz.incorrect.isEmpty
+                    ? 'Semua petunjuk terpecahkan. Siap mencoba misi lain?'
+                    : '${quiz.incorrect.length} puzzle bisa kamu latih lagi${quiz.timedOutCount > 0 ? ' · ${quiz.timedOutCount} waktu habis' : ''}.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              if (quiz.incorrect.isNotEmpty) ...[
+                CustomPrimaryButton(
+                  label: 'Latih yang Belum Tepat',
+                  icon: Icons.school_outlined,
+                  onPressed: () {
+                    if (!quiz.startPractice()) return;
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute<void>(
+                        builder: (_) => QuizScreen(
+                          quiz: quiz,
+                          onToggleTheme: onToggleTheme,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
               ],
-            ),
+              TextButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        ReviewScreen(quiz: quiz, onToggleTheme: onToggleTheme),
+                  ),
+                ),
+                icon: const Icon(Icons.fact_check_outlined),
+                label: const Text('Lihat Pembahasan'),
+              ),
+              const SizedBox(height: 12),
+              CustomPrimaryButton(
+                label: 'Main Lagi',
+                icon: Icons.replay_rounded,
+                onPressed: () {
+                  quiz.reset();
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+              ),
+              const SizedBox(height: 28),
+            ],
           ),
         ),
       ),
@@ -157,32 +157,21 @@ class ResultScreen extends StatelessWidget {
   }
 }
 
-class _Statistic extends StatelessWidget {
-  const _Statistic({
-    required this.value,
-    required this.label,
-    required this.icon,
-  });
+class _Stat extends StatelessWidget {
+  const _Stat(this.value, this.label);
   final String value;
   final String label;
-  final IconData icon;
   @override
   Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
     children: [
-      Icon(icon, size: 21, color: AppColors.yellow),
-      const SizedBox(height: 8),
       Text(
         value,
         style: Theme.of(
           context,
         ).textTheme.titleLarge?.copyWith(color: Colors.white),
       ),
-      Text(
-        label,
-        style: Theme.of(
-          context,
-        ).textTheme.bodyMedium?.copyWith(color: Colors.white),
-      ),
+      Text(label, style: const TextStyle(color: Colors.white)),
     ],
   );
 }

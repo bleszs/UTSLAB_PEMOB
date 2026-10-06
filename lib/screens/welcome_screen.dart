@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../controllers/quiz_controller.dart';
+import '../models/question.dart';
 import '../widgets/app_header.dart';
 import '../widgets/custom_primary_button.dart';
 import '../widgets/quiz_artwork.dart';
 import '../widgets/responsive_page.dart';
 import 'quiz_screen.dart';
+import 'mission_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({
@@ -22,6 +24,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final _form = GlobalKey<FormState>();
   final _name = TextEditingController();
   bool _submitted = false;
+  String _avatar = 'explorer';
+  GameMode _mode = GameMode.relaxed;
   @override
   void initState() {
     super.initState();
@@ -48,13 +52,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     if (!resume) {
       _submitted = true;
       if (!_form.currentState!.validate()) return;
-      widget.quiz.start(_name.text);
+      widget.quiz.setPlayer(_name.text, avatar: _avatar, mode: _mode);
     }
     FocusManager.instance.primaryFocus?.unfocus();
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) =>
-            QuizScreen(quiz: widget.quiz, onToggleTheme: widget.onToggleTheme),
+        builder: (_) => resume
+            ? QuizScreen(quiz: widget.quiz, onToggleTheme: widget.onToggleTheme)
+            : MissionScreen(
+                quiz: widget.quiz,
+                onToggleTheme: widget.onToggleTheme,
+              ),
       ),
     );
     if (!mounted) return;
@@ -75,6 +83,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         dark: theme.brightness == Brightness.dark,
         onToggleTheme: widget.onToggleTheme,
       ),
+      footer: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CustomPrimaryButton(
+            label: 'Pilih Misi',
+            onPressed: () => _openQuiz(),
+          ),
+          if (widget.quiz.hasSession)
+            TextButton(
+              onPressed: () => _openQuiz(resume: true),
+              child: const Text('Lanjutkan misi sebelumnya'),
+            ),
+        ],
+      ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final wide = constraints.maxWidth >= 720;
@@ -90,11 +112,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 children: [
                   _Feature(
                     icon: Icons.layers_outlined,
-                    label: '${widget.quiz.total} soal',
+                    label: '12 puzzle · 3 misi',
                   ),
                   const _Feature(
                     icon: Icons.timer_outlined,
-                    label: 'Tanpa batas waktu',
+                    label: '7 cara bermain',
                   ),
                 ],
               ),
@@ -107,12 +129,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Rasa ingin tahu,\nbertemu tantangan.',
+                  'Setiap petunjuk,\nsebuah petualangan.',
                   style: theme.textTheme.headlineLarge,
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  'Uji pengetahuanmu, temukan hal baru, dan rayakan setiap jawaban benar.',
+                  'Susun alur, temukan bukti, dan pecahkan kode dalam misi kehidupan kampus.',
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
@@ -136,7 +158,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Isi nama dulu, lalu mulai kuis.';
+                      return 'Isi nama dulu, lalu pilih misi.';
                     }
                     if (value.trim().runes.length > 30) {
                       return 'Gunakan nama maksimal 30 karakter.';
@@ -146,23 +168,60 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   onFieldSubmitted: (_) => _openQuiz(),
                 ),
                 const SizedBox(height: 20),
-                CustomPrimaryButton(
-                  label: 'Mulai Kuis',
-                  onPressed: () => _openQuiz(),
+                Text('Pilih avatarmu', style: theme.textTheme.titleMedium),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final avatar in const [
+                      ('explorer', 'Penjelajah', Icons.explore_outlined),
+                      ('detective', 'Detektif', Icons.search_rounded),
+                      ('inventor', 'Perakit', Icons.lightbulb_outline_rounded),
+                    ])
+                      ChoiceChip(
+                        avatar: Icon(avatar.$3, size: 20),
+                        label: Text(avatar.$2),
+                        selected: _avatar == avatar.$1,
+                        onSelected: (_) => setState(() => _avatar = avatar.$1),
+                        padding: const EdgeInsets.all(8),
+                      ),
+                  ],
                 ),
-                if (widget.quiz.hasSession) ...[
-                  const SizedBox(height: 8),
-                  Center(
-                    child: TextButton(
-                      onPressed: () => _openQuiz(resume: true),
-                      child: const Text('Lanjutkan kuis sebelumnya'),
+                const SizedBox(height: 20),
+                Text('Cara bermain', style: theme.textTheme.titleMedium),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ChoiceChip(
+                      label: const Text('Santai'),
+                      selected: _mode == GameMode.relaxed,
+                      onSelected: (_) =>
+                          setState(() => _mode = GameMode.relaxed),
+                      padding: const EdgeInsets.all(8),
                     ),
-                  ),
-                ],
+                    ChoiceChip(
+                      label: const Text('Tantangan'),
+                      selected: _mode == GameMode.challenge,
+                      onSelected: (_) =>
+                          setState(() => _mode = GameMode.challenge),
+                      padding: const EdgeInsets.all(8),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _mode == GameMode.relaxed
+                      ? 'Tanpa timer. Ambil waktu untuk memahami petunjuk.'
+                      : '90 detik per puzzle. Timer dijeda saat aplikasi ditinggalkan.',
+                  style: theme.textTheme.bodyMedium,
+                ),
                 const SizedBox(height: 18),
                 Center(
                   child: Text(
-                    'Satu pilihan per soal. Siap mencoba?',
+                    'Cerita fiksi, petunjuk nyata di layar. Siap menyelidiki?',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium,
                   ),

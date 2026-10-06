@@ -40,7 +40,7 @@ class AppHeader extends StatelessWidget {
       ],
       Expanded(
         child: Text(
-          title ?? 'quizora',
+          title ?? 'Quizora Quest',
           style: Theme.of(context).textTheme.titleLarge,
         ),
       ),

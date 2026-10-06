@@ -31,3 +31,5 @@ Konfigurasi ini hanya berlaku pada shell dan proses anaknya. Pengaturan Windows 
 File sistem Windows seperti `C:\pagefile.sys` berada di luar konfigurasi proyek. Lokasi paging Windows tidak diubah oleh script ini.
 
 `.runtime` dan `.gradle-local` tidak dimasukkan ke Git. Bila checkout dipindahkan ke komputer lain, siapkan JDK 17 pada lokasi di tabel dan gunakan `flutter pub get` tanpa `--offline` pada penggunaan pertama.
+
+Pada komputer ini, build ulang APK dilakukan dengan emulator ditutup sementara untuk mengurangi pemakaian memori. Sesudah build selesai, emulator dibuka lagi untuk menjalankan APK.

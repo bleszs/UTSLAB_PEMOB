@@ -25,7 +25,10 @@
 ## Verifikasi penyerahan
 
 - [x] Catat hasil analyze akhir dan capture visual akhir.
-- [ ] Catat hasil build APK di docs/testing.md.
+- [x] Catat hasil build APK di docs/testing.md.
+- [x] Jalankan APK di emulator Android API 35 dari drive D.
+- [x] Verifikasi native rotasi, font 1.3, skor 80, pembahasan, keyboard dan Main Lagi.
+- [x] Arahkan cache, TEMP/TMP, JDK dan data emulator ke D.
 - [ ] Uji pada Android fisik sebelum distribusi resmi.
 - [ ] Push ke GitHub setelah remote milik pengguna tersedia.
 

@@ -1,0 +1,7 @@
+{
+    "serial":  "emulator-5554",
+    "sdk":  "35",
+    "density":  "Physical density: 420",
+    "size":  "Physical size: 1080x2400",
+    "capture":  "Android adb screencap"
+}

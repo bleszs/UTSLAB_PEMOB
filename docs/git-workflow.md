@@ -1,6 +1,6 @@
 # Git dan penyerahan
 
-Repository Git lokal sudah dibuat dan perkembangan dikelompokkan dalam commit bermakna: setup, komponen/state, alur aplikasi, kemudian dokumentasi dan verifikasi. Tidak ada remote GitHub yang diberikan sehingga proyek belum dipush.
+Repository Git lokal sudah dibuat dan perkembangan dikelompokkan dalam commit bermakna: setup, komponen/state, alur aplikasi, dokumentasi awal, perbaikan reset/config drive D, kemudian dokumentasi dan bukti pemeriksaan native akhir. Tidak ada remote GitHub yang diberikan sehingga proyek belum dipush.
 
 Lihat riwayat dan kondisi kerja:
 

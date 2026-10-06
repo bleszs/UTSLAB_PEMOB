@@ -69,6 +69,8 @@ Capture tersebut bukan pengganti pemeriksaan perangkat Android. Bukti dan batas 
 | [docs/testing.md](docs/testing.md) | Hasil verifikasi dan skenario manual |
 | [docs/assets.md](docs/assets.md) | Sumber aset, lisensi font, prompt ilustrasi |
 | [docs/git-workflow.md](docs/git-workflow.md) | Histori lokal dan cara push GitHub |
+| [docs/quizora-quest-concept.md](docs/quizora-quest-concept.md) | Usulan v2 berbasis misi dan permainan; belum diterapkan |
+| [docs/question-system-v2.md](docs/question-system-v2.md) | Spesifikasi tujuh tipe interaksi dan 12 contoh puzzle untuk v2 |
 
 ## Mengubah konten
 

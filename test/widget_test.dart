@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quizora/main.dart';
 import 'package:quizora/controllers/quiz_controller.dart';
@@ -55,6 +56,52 @@ void setSize(WidgetTester tester, Size value) {
 }
 
 void main() {
+  testWidgets('semantic tap activates hotspot and choices and respects lock', (
+    tester,
+  ) async {
+    setSize(tester, const Size(390, 844));
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final semantics = tester.ensureSemantics();
+    try {
+      for (final q in [questions[1], questions[4], questions[3]]) {
+        final quiz = QuizController(questions: [q])
+          ..setPlayer('Ayu')
+          ..startMission();
+        await tester.pumpWidget(
+          MaterialApp(
+            key: ValueKey(q.id),
+            home: Scaffold(
+              body: ListenableBuilder(
+                listenable: quiz,
+                builder: (context, _) => PuzzleInteractor(quiz: quiz),
+              ),
+            ),
+          ),
+        );
+        final item = q.items.first;
+        final label =
+            'Pilih ${item.label}${item.detail.isEmpty ? '' : ': ${item.detail}'}';
+        final node = tester.getSemantics(find.bySemanticsLabel(label));
+        expect(node.getSemanticsData().hasAction(SemanticsAction.tap), true);
+        node.owner!.performAction(node.id, SemanticsAction.tap);
+        await tester.pump();
+        expect(quiz.answer, [item.id]);
+        quiz.updateAnswer(q.answerKey);
+        quiz.submit();
+        await tester.pump();
+        final locked = tester.getSemantics(find.bySemanticsLabel(label));
+        expect(locked.getSemanticsData().hasAction(SemanticsAction.tap), false);
+        expect(locked.getSemanticsData().flagsCollection.isEnabled, false);
+        locked.owner!.performAction(locked.id, SemanticsAction.tap);
+        expect(quiz.answer, q.answerKey);
+        await tester.pumpWidget(const SizedBox());
+        quiz.dispose();
+      }
+    } finally {
+      semantics.dispose();
+    }
+  });
   testWidgets('long-press token drag fills a slot and keeps token IDs unique', (
     tester,
   ) async {

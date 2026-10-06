@@ -149,6 +149,8 @@ class PuzzleInteractor extends StatelessWidget {
             Semantics(
               button: true,
               selected: quiz.answer.contains(item.id),
+              enabled: !quiz.submitted,
+              onTap: quiz.submitted ? null : () => quiz.updateAnswer([item.id]),
               label: 'Pilih ${item.label}: ${item.detail}',
               child: ExcludeSemantics(
                 child: InkWell(
@@ -485,6 +487,8 @@ class PuzzleChoice extends StatelessWidget {
     return Semantics(
       button: true,
       selected: selected,
+      enabled: onTap != null,
+      onTap: onTap,
       label:
           'Pilih ${item.label}${item.detail.isEmpty ? '' : ': ${item.detail}'}',
       child: ExcludeSemantics(

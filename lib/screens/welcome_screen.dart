@@ -21,6 +21,7 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> {
   final _form = GlobalKey<FormState>();
   final _name = TextEditingController();
+  bool _submitted = false;
   @override
   void initState() {
     super.initState();
@@ -29,6 +30,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   void _sessionChanged() {
     if (widget.quiz.name.isEmpty) {
+      _submitted = false;
       _form.currentState?.reset();
       _name.clear();
     }
@@ -44,6 +46,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   Future<void> _openQuiz({bool resume = false}) async {
     if (!resume) {
+      _submitted = true;
       if (!_form.currentState!.validate()) return;
       widget.quiz.start(_name.text);
     }
@@ -56,6 +59,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
     if (!mounted) return;
     if (widget.quiz.name.isEmpty) {
+      _submitted = false;
       _form.currentState?.reset();
       _name.clear();
     }
@@ -122,7 +126,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   maxLength: 30,
                   textCapitalization: TextCapitalization.words,
                   textInputAction: TextInputAction.done,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  onChanged: (_) {
+                    if (_submitted) _form.currentState?.validate();
+                  },
                   decoration: const InputDecoration(
                     hintText: 'Tulis nama panggilanmu',
                     prefixIcon: Icon(Icons.person_outline_rounded),

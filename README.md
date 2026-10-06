@@ -18,6 +18,7 @@ Prasyarat: Flutter SDK, Android SDK untuk Android, atau Chrome untuk web. Proyek
 
 ```powershell
 cd D:\UTSLABPEMMOB
+. .\tool\env_d.ps1
 flutter pub get
 flutter run
 ```
@@ -28,6 +29,8 @@ Pratinjau web:
 flutter run -d chrome
 ```
 
+Cache, file sementara, dan JDK lokal diarahkan ke D melalui `env_d.ps1`. Lihat [docs/drive-d.md](docs/drive-d.md) untuk lokasi lengkap. Pengaturan tersebut berlaku pada sesi PowerShell, bukan pengaturan Windows global.
+
 ## Pengujian dan build
 
 ```powershell
@@ -37,9 +40,9 @@ flutter build web --release
 flutter build apk --debug
 ```
 
-Output web: `build/web/`. Output APK debug jika build berhasil: `build/app/outputs/flutter-apk/app-debug.apk`. APK debug untuk pengujian; distribusi resmi memerlukan signing release milik pemilik proyek.
+Output web: `build/web/`. APK debug berhasil dibangun di `build/app/outputs/flutter-apk/app-debug.apk` dan dijalankan pada emulator Android API 35. APK debug untuk pengujian; distribusi resmi memerlukan signing release milik pemilik proyek.
 
-Jika cache Gradle global bermasalah, build dengan cache proyek terpisah:
+Build dengan script yang mengaktifkan seluruh lokasi kerja di D:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tool/build_android.ps1 -IsolatedCache

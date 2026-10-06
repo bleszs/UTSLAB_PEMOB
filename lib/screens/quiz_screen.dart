@@ -98,21 +98,6 @@ class _QuizScreenState extends State<QuizScreen> {
                   final question = Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Chip(
-                        label: Text(quiz.current.category),
-                        avatar: Icon(
-                          Icons.auto_awesome_outlined,
-                          size: 16,
-                          color: scheme.primary,
-                        ),
-                        side: BorderSide.none,
-                        backgroundColor: scheme.primary.withValues(alpha: .09),
-                        labelStyle: TextStyle(
-                          color: scheme.primary,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
                       Text(
                         quiz.current.text,
                         key: ValueKey(quiz.current.id),

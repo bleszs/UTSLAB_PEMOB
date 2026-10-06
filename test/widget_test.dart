@@ -58,6 +58,8 @@ void main() {
           .text,
       isEmpty,
     );
+    expect(find.text('Isi nama dulu, lalu mulai kuis.'), findsNothing);
+    expect(find.text('Lanjutkan kuis sebelumnya'), findsNothing);
     expect(tester.takeException(), isNull);
   });
   testWidgets('rotation, theme and back navigation preserve selection', (

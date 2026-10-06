@@ -22,7 +22,7 @@ Tool imagegen bawaan menghasilkan satu sprite sheet transparan. Dua bagian dipis
 - `assets/images/education.png`: topi wisuda, buku, lampu, dan bintang.
 - `assets/images/trophy.png`: piala emas, pedestal ungu, dan confetti.
 
-Sumber asli tetap tersimpan di direktori generated_images Codex. Salinan yang dipakai aplikasi berada di workspace. Aset generated ini bukan materi dari ZIP pengguna.
+Sumber asli juga disalin ke `references/generated/quiz-illustration-source.png` di drive D. Salinan yang dipakai aplikasi berada di workspace. Aset generated ini bukan materi dari ZIP pengguna. File sumber lama di C tidak dihapus.
 
 ### Prompt final
 

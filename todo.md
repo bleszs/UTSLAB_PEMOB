@@ -1,43 +1,41 @@
-# TODO — Quizora
+# TODO — Quizora Quest v2
 
-## Implementasi selesai
+## Implementasi
 
-- [x] Inisialisasi Flutter untuk Android dan pratinjau web.
-- [x] Dokumentasikan sumber brief dan referensi ZIP.
-- [x] Tambahkan Nunito lokal dan lisensinya.
-- [x] Buat aset edukasi dan piala 3D transparan.
-- [x] Terapkan tema ungu/kuning serta mode terang/gelap.
-- [x] Buat CustomPrimaryButton dan OptionCard reusable.
-- [x] Welcome StatefulWidget, TextEditingController, validasi nama.
-- [x] Quiz StatefulWidget, empat opsi, progress dan navigasi.
-- [x] Simpan sesi pada ChangeNotifier di root.
-- [x] Pertahankan pilihan saat rotasi, tema dan kembali.
-- [x] Result StatelessWidget dengan nama dan skor aktual.
-- [x] Main Lagi membersihkan sesi dan input.
-- [x] Tambahkan pembahasan dan lanjut sesi aktif.
-- [x] Responsive layout, SafeArea dan scroll.
-- [x] Uji skor 0/80/100 dan perlindungan double completion.
-- [x] Uji alur lengkap, rotasi dan landscape dengan teks besar.
-- [x] Buat PRD, SRS, arsitektur, sumber aset dan panduan Git.
-- [x] Buat commit bertahap di repository lokal.
-- [x] Build web release berhasil.
+- [x] Pertahankan identitas ungu/kuning, Nunito lokal, aset edukasi/piala.
+- [x] Profil nama/avatar serta mode Santai/Tantangan.
+- [x] Tiga misi × empat puzzle dan maraton 12.
+- [x] Tujuh tipe interaksi dan evaluator berbasis ID.
+- [x] Drag-and-drop dengan alternatif tap/tombol.
+- [x] Draft immutable dari luar; submit sekali dan jawaban terkunci.
+- [x] Feedback benar/salah, kunci dan penjelasan.
+- [x] Poin, combo, hint, timer 90 detik, bunyi opsional.
+- [x] Pause clock ketika navigasi/lifecycle tidak aktif.
+- [x] Akurasi terpisah dari poin, pembahasan dan latihan subset gagal.
+- [x] Main Lagi reset bersih; rotasi/tema/back-resume aman.
+- [x] Welcome dan Quiz dengan CTA footer, SafeArea dan konten scroll.
+- [x] Unit/widget tests untuk evaluator, full flow, clock, latihan dan drag.
+- [x] Perbarui PRD/SRS/arsitektur/konsep/README.
+- [x] Seluruh kerja dan cache proyek diarahkan ke D.
 
-## Verifikasi penyerahan
+## Verifikasi penyerahan v2
 
-- [x] Catat hasil analyze akhir dan capture visual akhir.
-- [x] Catat hasil build APK di docs/testing.md.
-- [x] Jalankan APK di emulator Android API 35 dari drive D.
-- [x] Verifikasi native rotasi, font 1.3, skor 80, pembahasan, keyboard dan Main Lagi.
-- [x] Arahkan cache, TEMP/TMP, JDK dan data emulator ke D.
-- [ ] Uji pada Android fisik sebelum distribusi resmi.
-- [ ] Push ke GitHub setelah remote milik pengguna tersedia.
+- [x] Analyze dan seluruh tes akhir lulus.
+- [x] Capture renderer akhir valid dengan font/aset dimuat.
+- [x] Build web release dan APK debug v2.
+- [x] Install/jalankan APK v2 di emulator Android API 35.
+- [x] Verifikasi native interaksi, rotasi/tema, hasil, latihan dan reset.
+- [x] Review independen serta dokumentasi DESIGN/sidecar v2.
+- [x] Catat bukti aktual pada docs/testing-v2.md.
+- [x] Commit implementasi serta hasil verifikasi.
 
-## Pengembangan opsional
+## Di luar versi ini
 
-- [ ] Launcher icon khusus Quizora.
-- [ ] Persistensi sesi untuk process death dan histori lokal.
-- [ ] Pilihan kategori serta bank soal tambahan.
-- [ ] Pengacakan opsi dan soal dengan kunci konsisten.
-- [ ] Leaderboard hanya bila backend dan aturan privasi tersedia.
+- [ ] Android fisik dan TalkBack sebelum distribusi resmi.
+- [ ] Signing release dan launcher icon khusus.
+- [ ] Persistensi sesi/histori setelah process death.
+- [ ] Editor/bank misi tambahan.
+- [ ] Multiplayer/room dan leaderboard dengan backend nyata.
+- [ ] Push GitHub setelah remote pengguna tersedia.
 
-Status pengujian terperinci berada di `docs/testing.md`. Item opsional tidak menjadi klaim fitur versi 1.
+Bukti versi 1 di docs/testing.md merupakan riwayat, bukan validasi build v2.

@@ -1,4 +1,4 @@
-# Quizora
+# Quizora Quest
 
 <!-- impeccable:product-schema 1 -->
 
@@ -16,11 +16,11 @@ Pengguna yang ingin mengerjakan kuis berbahasa Indonesia. Konteks tugas: proyek 
 
 ## Product Purpose
 
-Memasukkan nama, menjawab pertanyaan, dan melihat skor personal dalam alur yang jelas dan responsif.
+Memasukkan nama dan avatar, memilih misi, memecahkan puzzle dari petunjuk cerita, kemudian mempelajari hasil personal dan berlatih kembali.
 
 ## Capabilities and Constraints
 
-Welcome, kuis pilihan ganda empat opsi, progress, hasil personal, main lagi. Pilihan tetap ada saat rotasi. Komponen tombol dan opsi digunakan kembali. Dokumentasi Markdown dan commit bertahap diminta.
+Versi 2: tiga misi, 12 puzzle, tujuh interaksi, mode Santai/Tantangan, submit terkunci, feedback langsung, hint, combo, akurasi dan poin terpisah, pembahasan, latihan kesalahan dan Main Lagi. State serta timer tetap benar saat rotasi dan background. Seluruh runtime/cache/build berada di D; dokumentasi Markdown dan commit bertahap diminta.
 
 ## Brand Commitments
 
@@ -28,11 +28,11 @@ Ungu cerah, aksen kuning, Nunito atau Poppins, ilustrasi edukasi dan piala 3D. Z
 
 ## Evidence on Hand
 
-`references/images/Gemini_Generated_Image_h7fhevh7fhevh7fh.jpeg` adalah mockup referensi pengguna. Tidak ada kode incumbent.
+`references/images/Gemini_Generated_Image_h7fhevh7fhevh7fh.jpeg` adalah mockup hasil dari pengguna. Implementasi v1 dan capture sebelumnya menjadi bukti dunia visual yang dipertahankan. Pengguna meminta konsep seperti Quizizz dengan soal unik, kemudian menyetujui penerapan konsep Quest melalui “coba kerjakan”.
 
 ## Open Decisions and Assumptions
 
-Nama Quizora, 10 soal pengetahuan umum, dan pembahasan jawaban merupakan keputusan implementasi sementara. Pertanyaan topik sudah dikirim; default pengetahuan umum digunakan bila tidak ada arahan tambahan. Mode gelap mengikuti brief. Tidak ada server, login, atau leaderboard karena tidak ada sumber data peringkat.
+Tema v2 adalah logika kehidupan kampus sesuai konsep yang disetujui. Seluruh situasi puzzle fiksi dan mempunyai aturan serta kunci eksplisit. Tidak ada server, login, editor, multiplayer atau leaderboard online. Sesi masih di memori; penghentian proses tidak mempertahankan sesi. Suara berupa efek sistem singkat, bukan musik. Timer 90 detik per puzzle pada Mode Tantangan dijeda selama aplikasi tidak aktif atau pemain keluar dari layar misi.
 
 ## Product Principles
 

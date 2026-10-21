@@ -1,124 +1,109 @@
-# Software Requirements Specification — Quizora
+# Software Requirements Specification — Quizora Quest
 
-Versi 1.0 · 6 Oktober 2026
+Versi 2.0 · 7 Oktober 2026
 
-## 1. Gambaran sistem
+## 1. Sistem dan lingkungan
 
-Aplikasi Flutter Material 3 berjalan secara lokal. Input berupa nama dan pilihan jawaban; output berupa progress, skor, serta pembahasan. Semua aset dan font dibundel. Tidak diperlukan koneksi internet untuk menjalankan kuis Android setelah instalasi.
+Flutter Material 3 offline dengan Flutter 3.35.7 / Dart 3.9.2. Android target utama, web pratinjau. Dependensi runtime hanya Flutter SDK; Nunito dan dua ilustrasi PNG dibundel. Seluruh proyek, cache pengembangan, TEMP/TMP, JDK dan AVD diarahkan ke D oleh tool/env_d.ps1. Bahasa antarmuka Indonesia.
 
-## 2. Lingkungan
+## 2. Kebutuhan fungsional
 
-- Implementasi: Flutter 3.35.7 dan Dart 3.9.2 yang tersedia pada mesin pengembangan.
-- Target: Android, dengan web untuk pratinjau.
-- Dependensi runtime: Flutter SDK saja.
-- Pengembangan: flutter_test dan flutter_lints, dikunci dalam pubspec.lock.
-- Bahasa antarmuka: Indonesia. Font: Nunito dengan lisensi SIL OFL.
-- Konfigurasi SDK Android lokal tidak dimasukkan ke Git.
-
-## 3. Kebutuhan fungsional
-
-| ID | Kebutuhan | Implementasi / bukti |
+| ID | Kebutuhan | Implementasi / verifikasi |
 |---|---|---|
-| FR-01 | Sistem menampilkan Welcome dengan ilustrasi edukasi | WelcomeScreen, QuizArtwork |
-| FR-02 | Sistem menerima dan trim nama 1–30 karakter | TextFormField, QuizController.start |
-| FR-03 | Input tidak valid menghasilkan pesan dan tetap pada Welcome | validator, widget test |
-| FR-04 | Mulai Kuis menginisialisasi seluruh state | start mengatur nama, indeks, answers |
-| FR-05 | Setiap soal memiliki empat opsi dan kunci valid | Question, validasi controller |
-| FR-06 | Sistem hanya menyimpan satu pilihan per soal | slot answers[index] |
-| FR-07 | Pilihan dapat diganti sebelum selesai | select menimpa slot yang sama |
-| FR-08 | Sistem memblokir lanjut jika belum menjawab | tombol null, guard next |
-| FR-09 | Sistem menampilkan posisi dan progress jawaban | index+1, answered/total |
-| FR-10 | Kembali membuka soal sebelumnya beserta pilihannya | previous, PopScope |
-| FR-11 | Kembali dari soal pertama membuka Welcome | Navigator.pop |
-| FR-12 | Sesi aktif dapat dilanjutkan dari Welcome | tombol Lanjutkan kuis sebelumnya |
-| FR-13 | Soal terakhir yang dijawab menyelesaikan sesi | next mengatur completed |
-| FR-14 | Sistem menghitung skor dari kunci, tanpa double count | correct dan score |
-| FR-15 | Sistem menampilkan nama, piala, skor, benar/salah | ResultScreen |
-| FR-16 | Main Lagi membersihkan state dan input nama | reset, listener Welcome |
-| FR-17 | Pembahasan memuat jawaban, kunci, penjelasan | ReviewScreen |
-| FR-18 | Sistem menyediakan tema terang dan gelap | ThemeMode, AppTheme |
-| FR-19 | Perubahan ukuran/tema tidak membuat sesi baru | controller pada root app |
+| FR-01 | Validasi nama trim 1–30 karakter dan avatar sah | WelcomeScreen, setPlayer, tes profil |
+| FR-02 | Mode Santai/Tantangan dan pemilihan misi | MissionScreen, startMission, tes filter |
+| FR-03 | Tujuh bentuk soal dengan ID stabil | QuestionType, PuzzleInteractor, tes evaluator |
+| FR-04 | Kunci dan bank divalidasi saat controller dibuat | QuizController constructor |
+| FR-05 | Draft dapat diubah sampai dikirim | updateAnswer, tes lock |
+| FR-06 | Jawaban lengkap diperlukan sebelum kirim | Question.isComplete, canSubmit |
+| FR-07 | Submit sekali menghasilkan immutable PuzzleAttempt | submit, tes double count |
+| FR-08 | Feedback memuat jawaban, kunci, alasan, poin | PuzzleFeedback |
+| FR-09 | Petunjuk sekali per puzzle dan hanya sebelum submit | useHint, tes hint/combo |
+| FR-10 | Akurasi dan poin memiliki aturan terpisah | score, points, tes 1470 |
+| FR-11 | Combo, bonus waktu, dan timeout mengikuti PRD | submit, checkClock, fake clock tests |
+| FR-12 | Timer dijeda oleh navigasi/lifecycle | setNavigationPaused, setLifecyclePaused |
+| FR-13 | Draft/progress tidak hilang ketika rotasi/tema | controller root, widget/native evidence |
+| FR-14 | Back ke Welcome dapat dilanjutkan | hasSession, tombol Lanjutkan |
+| FR-15 | Terakhir sesudah submit menuju hasil | next, ResultScreen |
+| FR-16 | Pembahasan menampilkan seluruh attempt | ReviewScreen |
+| FR-17 | Latihan hanya memuat puzzle belum tepat | startPractice, unit/widget tests |
+| FR-18 | Main Lagi membersihkan state dan nama input | reset, Welcome listener, tes replay |
+| FR-19 | Tema dan bunyi dapat diubah | ThemeMode, toggleSound |
+| FR-20 | Semua operasi drag memiliki alternatif tap | PuzzleInteractor, tes UI lengkap |
 
-## 4. Kebutuhan nonfungsional
+## 3. Kebutuhan nonfungsional
 
-| ID | Kebutuhan | Kriteria verifikasi |
+| ID | Kriteria | Bukti |
 |---|---|---|
-| NFR-01 | Responsif pada portrait dan landscape | Widget test ukuran kecil dan rotasi |
-| NFR-02 | Mendukung pembesaran teks | Landscape 568×320, skala teks 1.5 |
-| NFR-03 | Area sentuh utama memadai | Tombol min tinggi 58, ikon min 48 |
-| NFR-04 | Konten aman dari inset OS/keyboard | SafeArea dan Scaffold resize |
-| NFR-05 | Font/aset tersedia lokal | deklarasi pubspec dan aset bundel |
-| NFR-06 | Komponen UI dapat digunakan kembali | tombol, opsi, header, halaman, artwork |
-| NFR-07 | Pemisahan tanggung jawab | models, data, controllers, screens, widgets, utils |
-| NFR-08 | State tidak hilang ketika rotasi | tes pilihan sebelum/sesudah perubahan viewport |
-| NFR-09 | Kontrol memiliki informasi semantik | label/selected opsi, progress, skor, tooltip |
-| NFR-10 | Kode dapat dianalisis dan diuji | analyze dan flutter test |
-| NFR-11 | Dokumentasi dapat ditelusuri | PRD, SRS, arsitektur, pengujian, todo |
+| NFR-01 | Portrait/landscape tanpa orientasi dikunci | Widget tests, emulator |
+| NFR-02 | Seluruh tipe aman pada 568×320 skala teks 1.5 | Widget renderer test |
+| NFR-03 | Konten bergulir, SafeArea, keyboard resize | ResponsivePage, native capture |
+| NFR-04 | Tidak membuat controller baru ketika rebuild/rotasi | State root dan lifecycle observer |
+| NFR-05 | Sesi Android tidak membutuhkan jaringan | Aset/font/bank lokal, SDK saja |
+| NFR-06 | Reusable component dan lapisan terpisah | widgets/models/data/controllers/screens/utils |
+| NFR-07 | Pilihan memiliki label/selected dan feedback tidak hanya warna | Semantics, ikon, teks |
+| NFR-08 | Animasi mengikuti reduced motion | AnimatedSwitcher duration mengikuti MediaQuery |
+| NFR-09 | Sumber dan keputusan dapat ditelusuri | PRODUCT, DESIGN, PRD/SRS, docs dan Git |
+| NFR-10 | Analisis statis dan pengujian lulus | docs/testing-v2.md |
 
-NFR-08 berlaku untuk perubahan konfigurasi saat proses hidup, bukan process death. Pemulihan setelah OS menghentikan proses belum diimplementasikan.
+State dijamin selama proses Flutter hidup. Pemulihan setelah process death/reload belum diimplementasikan. Kualitas aksesibilitas di TalkBack fisik belum diuji.
 
-## 5. Struktur data
+## 4. Struktur data
 
-### Question
-
-| Field | Tipe | Aturan |
+| Model | Field penting | Aturan |
 |---|---|---|
-| id | String | Unik dalam bank soal |
-| category | String | Label kategori untuk orientasi pengguna |
-| text | String | Pertanyaan lengkap |
-| options | List<String> | Tepat empat pilihan berbeda |
-| correctIndex | int | Indeks 0–3 |
-| explanation | String | Penjelasan kunci |
+| Mission | id, title, description | missionId mengelompokkan bank |
+| PuzzleItem | id, label, detail | ID unik per items/targets |
+| Question | id, missionId, type, title, context, instruction, items, targets, answerKey, hint, explanation | Kunci lengkap dan valid untuk tipe |
+| PuzzleAttempt | answer, correct, usedHint, timedOut, points, comboBonus, timeBonus | Immutable, satu per ID per sesi |
 
-### QuizController
+Bentuk jawaban:
+- sequence: daftar item ID dalam urutan.
+- hotspot/scenario: satu item ID.
+- matching/categorize: target ID per posisi item; matching mensyaratkan pasangan unik.
+- multiSelect: himpunan item ID, urutan tidak memengaruhi evaluasi.
+- codeBuilder: daftar token ID per slot, tanpa token ganda.
 
-Nama, indeks aktif, daftar pilihan nullable, dan completed merupakan state mutabel. Daftar pertanyaan dan getter answers diekspos sebagai list yang tidak dapat dimutasi. Skor dan progress dihitung dari state, bukan disimpan sebagai penghitung tambahan.
+Urutan tampilan dapat berubah tanpa merusak kunci karena penilaian memakai ID. Seluruh draft dan attempt diekspos sebagai koleksi yang tidak dapat dimutasi dari luar.
 
-## 6. Mesin state
+## 5. Mesin state
 
 ```mermaid
 stateDiagram-v2
     [*] --> Welcome
-    Welcome --> Quiz: nama valid / start
-    Quiz --> Quiz: pilih, revisi, lanjut, kembali
-    Quiz --> Welcome: kembali dari soal pertama
-    Welcome --> Quiz: lanjutkan sesi
-    Quiz --> Result: soal terakhir dijawab
-    Result --> Review: lihat pembahasan
-    Review --> Result: kembali
-    Result --> Welcome: main lagi / reset
+    Welcome --> Missions: setPlayer valid
+    Missions --> Editing: startMission
+    Editing --> Editing: updateAnswer / useHint
+    Editing --> Feedback: submit lengkap atau timeout
+    Feedback --> Editing: next, puzzle berikutnya
+    Feedback --> Result: next, puzzle terakhir
+    Editing --> Welcome: back, pause
+    Feedback --> Welcome: back, pause
+    Welcome --> Editing: resume draft
+    Welcome --> Feedback: resume terkirim
+    Result --> Review
+    Review --> Result
+    Result --> Editing: startPractice, puzzle gagal
+    Result --> Welcome: reset
 ```
 
-## 7. Use case
+Clock aktif hanya jika mode Tantangan, sesi aktif, belum submit, navigasi aktif, dan lifecycle aktif. Timer periodik memeriksa deadline; submit juga memeriksa deadline agar input tepat sesudah batas tidak memperoleh poin.
 
-### UC-01 — Menyelesaikan kuis
+## 6. Use case dan error
 
-Prasyarat: aplikasi terbuka. Pengguna mengisi nama, memulai kuis, memilih jawaban pada setiap soal, dan melihat hasil. Alternatif: nama kosong ditolak; jawaban kosong memblokir lanjut; pengguna dapat kembali untuk revisi. Pascakondisi: completed benar, seluruh jawaban tersimpan, skor tersedia.
+UC-01: profil → misi → jawab/kirim/feedback → hasil → pembahasan/reset.
+UC-02: rotasi dengan kode parsial → layout berubah → token/petunjuk/indeks tetap.
+UC-03: hasil dengan puzzle salah → latihan hanya puzzle itu → hasil sesi latihan terpisah.
+UC-04: background/back saat Tantangan → clock pause → resume dengan sisa waktu sama.
 
-### UC-02 — Memutar perangkat
+Nama, avatar, ID, panjang draft, missionId, bank kosong/duplikat/kunci invalid ditolak. Update sesudah submit diabaikan, submit duplikat gagal, dan next tanpa submit tidak melanjutkan. Tidak ada hasil parsial; tiap puzzle harus dikirim atau timeout.
 
-Prasyarat: sesi aktif dan minimal satu pilihan sudah dibuat. Perangkat berganti orientasi. Flutter membangun layout sesuai lebar baru dengan controller yang sama. Pascakondisi: nama, indeks, dan pilihan identik.
-
-### UC-03 — Mengulang
-
-Prasyarat: halaman hasil. Pengguna menekan Main Lagi. Controller direset dan stack route kembali ke root. Pascakondisi: input nama kosong, seluruh jawaban null, indeks nol.
-
-## 8. Batasan dan penanganan error
-
-- Controller menolak bank soal kosong atau struktur opsi/kunci tidak valid.
-- Pemilihan indeks opsi di luar jangkauan ditolak.
-- Operasi pemilihan setelah selesai diabaikan; next tidak menyelesaikan dua kali.
-- Tidak ada hasil kuis parsial; pengguna harus menjawab seluruh soal.
-- Nama hanya lokal dan tidak dikirim ke server.
-- Aplikasi tidak menyimpan identitas atau histori skor setelah proses berakhir.
-
-## 9. Matriks ketertelusuran
+## 7. Ketertelusuran
 
 | Tujuan PRD | Requirement | Pengujian |
 |---|---|---|
-| Input valid | FR-02–04 | controller names, full flow |
-| Kuis lengkap | FR-05–10 | answer revision, full flow |
-| Skor personal | FR-13–15 | mixed, zero/perfect, full flow |
-| Main lagi | FR-16 | reset dan replay |
-| Pembahasan | FR-17 | full flow review |
-| Rotasi dan tema | FR-18–19, NFR-01/02/08 | rotation/theme, enlarged text |
+| Puzzle beragam | FR-03–06, FR-20 | 7 evaluator, full UI 12, drag token |
+| Skor adil | FR-07–11 | immutability, 1470, hints/combo, clock |
+| Latihan dan reset | FR-15–18 | unit + widget practice/replay |
+| Sesi aman | FR-12–14, NFR-01–04 | rotation/theme/back-resume, lifecycle clock |
+| Tampilan responsif | NFR-01–03/07/08 | seluruh tipe landscape/text scale dan capture native |

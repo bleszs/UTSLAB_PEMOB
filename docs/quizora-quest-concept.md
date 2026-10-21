@@ -1,12 +1,12 @@
 # Quizora Quest — rancangan konsep v2
 
-Status: usulan pengalaman baru, belum diterapkan pada APK v1. Tanggal: 7 Oktober 2026.
+Status: konsep disetujui pengguna melalui “coba kerjakan” dan diterapkan pada source v2. Tanggal: 7 Oktober 2026. Bukti build dan pengujian dicatat di `testing-v2.md`.
 
 ## Gagasan utama
 
 Quizora menjadi permainan misi singkat. Pemain membaca situasi, memanipulasi bukti, mengirim jawaban, mendapat penjelasan, lalu membuka tantangan berikutnya. Poin, combo dan selebrasi memberi ritme seperti kuis permainan. Identitas ungu/kuning, Nunito, Material dan ilustrasi 3D tetap menjadi dasar desain.
 
-Tema awal yang diusulkan: **logika dan misteri kehidupan kampus**. Tema ini adalah asumsi rancangan sambil menunggu preferensi pengguna. Semua tokoh, jadwal, angka dan kejadian pada contoh adalah fiksi yang sengaja dibuat untuk puzzle; jawabannya dapat ditentukan dari informasi di layar.
+Tema yang diterapkan: **logika dan misteri kehidupan kampus**, mengikuti konsep yang diminta untuk dikerjakan. Semua tokoh, jadwal, angka dan kejadian pada contoh adalah fiksi yang sengaja dibuat untuk puzzle; jawabannya dapat ditentukan dari informasi di layar.
 
 ## Pengalaman pemain
 

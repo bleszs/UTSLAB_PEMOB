@@ -1,74 +1,57 @@
-# Arsitektur dan panduan kode
+# Arsitektur Quizora Quest v2
 
 ## Struktur
 
 ```text
 lib/
-  main.dart                     # Root: lifecycle state dan tema
-  controllers/quiz_controller.dart
-  data/questions.dart           # Bank soal lokal
-  models/question.dart          # Bentuk data soal
+  main.dart                         # Root, theme, observer lifecycle
+  controllers/quiz_controller.dart  # Draft, attempts, scoring, timer
+  models/question.dart              # Mission, PuzzleItem, Question, PuzzleAttempt
+  data/questions.dart               # 3 misi dan 12 puzzle fiksi
   screens/
-    welcome_screen.dart         # Stateful: form dan nama
-    quiz_screen.dart            # Stateful: aksi dan navigasi
-    result_screen.dart          # Stateless: hasil
-    review_screen.dart          # Stateless: pembahasan
+    welcome_screen.dart             # Form, nama, avatar, mode
+    mission_screen.dart             # Misi dan maraton
+    quiz_screen.dart                # Editor, PuzzleFeedback, navigasi
+    result_screen.dart              # Akurasi, poin, latihan, reset
+    review_screen.dart              # Pembahasan attempts
   widgets/
-    app_header.dart
+    puzzle_interactor.dart          # 7 renderer dengan alternatif drag/tap
     custom_primary_button.dart
-    option_card.dart
+    app_header.dart
     quiz_artwork.dart
     responsive_page.dart
   utils/app_theme.dart
-assets/
-  fonts/                        # Nunito dan lisensi
-  images/                       # Ilustrasi PNG transparan
-test/                           # Unit dan widget tests
-tool/                           # Capture visual yang dapat diulang
-docs/                           # Bukti, panduan, dan screenshot
+test/                               # Evaluator/controller dan UI
+tool/                               # Lingkungan D, build, capture
+docs/                               # Spesifikasi dan bukti
 ```
 
-## Pemisahan tanggung jawab
+## Tanggung jawab dan state
 
-Model menjelaskan bentuk data; data menyediakan soal; controller mengatur aturan sesi; layar mengatur alur presentasi; widget memuat komponen berulang; utils memuat tema. Struktur ini menggunakan pemisahan lapisan sederhana yang sesuai skala aplikasi, tanpa repository/server tambahan.
+Model menentukan bentuk jawaban serta evaluasinya. Data menyusun cerita, petunjuk, dan kunci. Controller memegang profil, bank immutable, subset misi, draft per ID, attempt immutable, hint, combo, dan deadline. Layar menyampaikan tindakan ke controller; widget menggambar interaksi sesuai tipe.
 
-```mermaid
-flowchart TD
-    App[QuizoraApp] --> Controller[QuizController / ChangeNotifier]
-    App --> Theme[ValueNotifier ThemeMode]
-    Controller --> Data[Question bank]
-    App --> Welcome[WelcomeScreen]
-    Welcome --> Quiz[QuizScreen / ListenableBuilder]
-    Quiz --> Result[ResultScreen]
-    Result --> Review[ReviewScreen]
-    Screens[Seluruh layar] --> Widgets[Reusable widgets]
-    Widgets --> Tokens[AppTheme / ColorScheme]
-```
-
-## Keputusan state management
-
-QuizController dibuat sekali pada State root app dan dibuang melalui dispose. Route menerima referensi yang sama. ListenableBuilder pada kuis merespons perubahan pilihan dan indeks. Rotasi hanya memicu perubahan constraint, bukan memanggil start. Tema disimpan pada ValueNotifier terpisah agar perubahan tema tidak membuat controller baru.
-
-Welcome menggunakan TextEditingController dan Form. Listener sesi membersihkan nama saat reset dan memperbarui tindakan lanjut sesi. Listener serta TextEditingController dilepas ketika Welcome dibuang.
+QuizController dibuat sekali di State root. Route menerima referensi yang sama, sehingga rebuild akibat rotasi atau tema tidak mereset sesi. Welcome menggunakan TextEditingController/Form; listener membersihkan nama/validasi saat reset. QuizScreen mengatur pause navigasi; root WidgetsBindingObserver mengatur pause lifecycle. Timer, observer, controller, dan listener dibuang melalui dispose.
 
 ## Navigasi
 
-- Welcome → Quiz memakai push.
-- Quiz → Result memakai pushReplacement sehingga kuis selesai tidak dibuka ulang dari hasil.
-- Result → Review memakai push.
-- Main Lagi memakai reset dan popUntil route pertama.
-- Tombol/system back pada kuis kembali ke soal sebelumnya; dari soal pertama kembali ke Welcome, dengan sesi masih dapat dilanjutkan.
+Welcome push MissionScreen; pilihan misi pushReplacement QuizScreen. Quiz selesai pushReplacement ResultScreen; pembahasan push ReviewScreen. Latihan mengganti hasil dengan QuizScreen setelah subset gagal diinisialisasi sebagai sesi baru. Back kuis menuju root sambil menyimpan draft/attempt. Main Lagi reset dan popUntil root.
 
-## Responsivitas
+Jawaban yang sudah dikirim terkunci. Pengguna dapat keluar/resume, tetapi tidak mengganti jawaban setelah feedback membocorkan kunci. Memulai profil baru membersihkan sesi lama.
 
-ResponsivePage memusatkan lebar maksimum 1040 logical pixel, menggunakan SafeArea, dan menyediakan konten bergulir. Padding halaman 24 untuk lebar layar di bawah 600, selebihnya 40. Welcome dan kuis memakai dua kolom pada lebar konten minimal 720; selebihnya satu kolom. Halaman hasil dibatasi 640 dan pembahasan 800. Nilai batas dan spacing adalah token desain; ukuran tombol tidak dikunci ke lebar perangkat tertentu.
+## Jawaban dan penilaian
 
-Footer kuis tetap mudah dijangkau sementara pertanyaan/opsi bisa digulir. Label tombol memakai Flexible; pertanyaan dan nama boleh membungkus. Sistem tidak mengunci orientasi Android.
+Draft memakai ID stabil, tidak memakai indeks pilihan. Untuk matching/kategori, posisi daftar merepresentasikan item yang dipasangkan; nilainya target ID. Sequence dan code mempertimbangkan urutan, multi-select membandingkan set. isComplete memisahkan kelengkapan dari benar/salah. submit menyimpan snapshot immutable agar update/submit berulang tidak mengubah skor.
 
-## Menambah atau mengubah soal
+Akurasi dihitung dari attempt benar. Poin dihitung dari seluruh attempt; bonus combo dan waktu tercatat terpisah. Hint menurunkan base benar menjadi 70 dan memutus combo. Latihan memilih daftar incorrect dari sesi selesai sebelum mereset attempts.
 
-Edit `lib/data/questions.dart`, isi id unik, kategori, pertanyaan, empat opsi, correctIndex 0–3, dan penjelasan. Jumlah soal, progress, dan skor menyesuaikan otomatis. Uji controller memeriksa keunikan id dan opsi. Ganti label topik di QuizScreen jika keseluruhan bank berubah.
+## Clock
 
-## Penyimpanan
+Mode Tantangan memakai deadline dan sisa Duration. Timer 250 ms hanya memberi notifikasi saat detik tampil berubah. Navigasi/lifecycle pause mengubah deadline menjadi sisa waktu; resume membentuk deadline baru. Submit selalu memeriksa waktu, sehingga timeout tidak dapat dilangkahi oleh draft benar. Feedback tidak menghabiskan waktu puzzle berikutnya.
 
-State hanya di memori. Untuk kebutuhan pemulihan process death di masa depan, tambahkan penyimpanan sesi dan versi bank soal; kebutuhan itu tidak sama dengan menjaga pilihan saat rotasi. Saat ini tidak ada kredensial atau koneksi backend.
+## Responsivitas dan akses
+
+ResponsivePage: SafeArea, konten scroll, maxWidth 1040, padding 24 di layar <600 dan 40 selebihnya. Welcome/Quiz dua kolom pada lebar konten ≥720. Footer Welcome/Quiz tetap terlihat. Token/chip memakai Wrap; teks tidak dikunci satu baris. Reorder memiliki tombol naik/turun, matching/kategori pilihan chip, dan kode bisa diisi dengan tap. Tema dari ColorScheme serta Nunito lokal.
+
+## Mengembangkan bank
+
+Tambahkan Question pada lib/data/questions.dart, isi missionId, tipe, items/targets dan answerKey yang lengkap. Seluruh ID unik dalam lingkupnya. Tambahkan kasus evaluator dan skenario UI bila aturan tipe berubah. Untuk jenis baru, perluas QuestionType, isComplete/evaluate/describe, serta PuzzleInteractor. Penyimpanan permanen dan backend belum menjadi lapisan sistem ini.

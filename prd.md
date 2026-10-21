@@ -1,78 +1,80 @@
-# Product Requirements Document — Quizora
+# Product Requirements Document — Quizora Quest
 
-Versi 1.0 · 6 Oktober 2026 · Bahasa Indonesia
+Versi 2.0 · 7 Oktober 2026 · Bahasa Indonesia
 
 ## 1. Tujuan
 
-Membangun aplikasi kuis Flutter untuk tugas UTS laboratorium pemrograman mobile. Aplikasi membawa pengguna dari pengisian nama hingga skor personal melalui antarmuka modern, responsif, dan mudah dipahami.
+Membuat aplikasi Flutter berbasis misi yang mengajak pengguna memecahkan masalah menggunakan informasi di layar. Pengalaman kuis permainan menjadi inspirasi, dengan identitas Quizora sendiri dan bentuk soal yang beragam. Aplikasi sekaligus menunjukkan input, navigasi, state management, aset, font, reusable widgets, dan responsivitas untuk tugas UTS.
 
 ## 2. Sumber kebutuhan
 
-- Brief pengguna di percakapan merupakan sumber kebutuhan utama.
-- ZIP referensi memuat satu gambar mockup halaman hasil; gambar dipakai sebagai acuan warna, piala, dan hierarki skor.
-- Teks atau simbol di dalam gambar tidak dianggap sebagai instruksi tambahan. Nama pada mockup bukan identitas yang diwajibkan di aplikasi.
-- Nama produk **Quizora**, bank 10 soal pengetahuan umum, serta halaman pembahasan adalah pilihan implementasi. Topik dapat diganti melalui `lib/data/questions.dart`.
+Brief percakapan pengguna merupakan otoritas utama: ungu/kuning, Nunito/Poppins, aset edukasi/piala, Welcome/Quiz/Result, rotasi aman, folder rapi, commit bertahap, dan dokumentasi Markdown. Permintaan berikutnya menambahkan konsep seperti Quizizz dengan soal yang unik; konsep Quest diterima melalui “coba kerjakan”. [Konsep](docs/quizora-quest-concept.md) dan [sistem soal](docs/question-system-v2.md) menjadi spesifikasi pengembangan v2.
 
-## 3. Pengguna dan masalah
+ZIP pengguna berisi satu mockup hasil. Teks di dalam gambar adalah materi referensi, bukan instruksi tambahan. Cerita, nama produk, angka, dan kunci puzzle merupakan konten implementasi fiksi.
 
-Pengguna ingin mengerjakan kuis singkat tanpa akun dan memahami hasilnya. Penguji tugas perlu melihat navigasi, input, state management, aset, custom font, reusable widgets, dan responsivitas yang benar-benar bekerja.
+## 3. Ruang lingkup
 
-## 4. Ruang lingkup versi 1
+| Fitur | Perilaku |
+|---|---|
+| Welcome | Nama 1–30 karakter setelah trim, avatar, pilihan mode |
+| Pemilihan misi | Tiga misi × empat puzzle; maraton 12 puzzle |
+| Tujuh interaksi | Urutan, hotspot dokumen, matching, kategori, multi-select, code builder, skenario |
+| Pengiriman | Jawaban lengkap diperlukan; evaluasi satu kali; hasil terkunci |
+| Pembelajaran | Petunjuk opsional sebelum kirim, feedback dan alasan sesudah kirim |
+| Gamifikasi | Poin, combo, bunyi klik opsional, bonus waktu |
+| Mode | Santai tanpa timer; Tantangan 90 detik per puzzle |
+| Hasil | Nama/avatar, piala, akurasi, poin, combo terbaik, petunjuk |
+| Latihan | Puzzle yang belum tepat saja, sebagai sesi baru |
+| Pembahasan | Jawaban pengguna, kunci, penjelasan tiap puzzle |
+| State | Rotasi/tema/navigasi mempertahankan sesi selama proses hidup |
+| Main Lagi | Kembali ke Welcome dan membersihkan input/sesi |
+| Akses | Drag memiliki alternatif tap/tombol; layout dapat digulir |
 
-| Prioritas | Fitur | Perilaku |
-|---|---|---|
-| Wajib | Welcome | Ilustrasi edukasi 3D, nama, tombol Mulai Kuis |
-| Wajib | Validasi nama | Nama setelah trim berisi 1–30 karakter |
-| Wajib | Kuis | Empat opsi per soal, satu pilihan aktif |
-| Wajib | Progress | Posisi soal dan jumlah jawaban terisi |
-| Wajib | Navigasi | Lanjut setelah memilih, kembali untuk revisi |
-| Wajib | State | Pilihan tidak hilang saat rotasi |
-| Wajib | Hasil | Piala 3D, nama dinamis, skor dan ringkasan |
-| Wajib | Main lagi | Kembali ke Welcome dan bersihkan sesi |
-| Wajib | Desain | Ungu/kuning, Nunito lokal, komponen reusable |
-| Tambahan | Tema | Ikuti tema sistem; pengguna dapat beralih terang/gelap |
-| Tambahan | Pembahasan | Jawaban pengguna, kunci, dan penjelasan |
-| Tambahan | Lanjut sesi | Jika kembali ke Welcome, sesi aktif bisa dilanjutkan |
+## 4. Konten misi
+
+1. **Selamatkan Presentasi:** susun file, periksa anggaran, pasangkan alat, pilih tindakan saat baterai hampir habis.
+2. **Detektif Jadwal:** temukan bentrok waktu, kelompokkan bukti, susun agenda, temukan reservasi yang melanggar aturan.
+3. **Kunci Ruang Lab:** rakit kode dari petunjuk, pilih kombinasi dokumen, pasangkan terminal, pilih langkah membuka pintu.
+
+Tidak diperlukan informasi di luar petunjuk. Urutan soal dan token awal disusun tetap agar latihan dapat direproduksi.
 
 ## 5. Alur pengguna
 
-1. Buka aplikasi dan isi nama.
-2. Tekan Mulai Kuis; input kosong menampilkan pesan yang dapat diperbaiki.
-3. Pilih satu dari empat opsi; jawaban tidak langsung dibocorkan.
-4. Tekan Selanjutnya. Tombol kembali membuka soal sebelumnya beserta pilihan tersimpan.
-5. Pada soal terakhir, tekan Lihat Hasil.
-6. Baca skor dan pilih pembahasan atau Main Lagi.
+```mermaid
+flowchart LR
+    W[Welcome: nama/avatar/mode] --> M[Pilih misi atau maraton]
+    M --> Q[Kerjakan puzzle]
+    Q --> F[Kirim: feedback terkunci]
+    F --> Q
+    F --> R[Hasil]
+    R --> V[Pembahasan]
+    R --> P[Latihan puzzle belum tepat]
+    P --> Q
+    R --> W
+```
 
-## 6. Aturan skor
+Kembali dari kuis menuju Welcome menjeda sesi; tombol Lanjutkan memulihkannya. Memulai profil baru membersihkan sesi sebelumnya. Pembahasan dapat dibuka setelah hasil. Tidak ada revisi jawaban sesudah kunci ditampilkan.
 
-Setiap soal bernilai sama. `skor = round(jumlah benar / jumlah soal × 100)`. Ringkasan menampilkan jumlah soal, benar, dan salah. Tidak ada penalti waktu, timer, atau pengacakan. Untuk 10 soal, delapan jawaban benar menghasilkan skor 80.
+## 6. Aturan skor dan waktu
 
-## 7. Prinsip pengalaman
+Akurasi: `round(benar / total × 100)`. Poin benar 100; dengan petunjuk 70; salah/waktu habis 0. Combo tanpa petunjuk: bonus +10 pada benar ketiga berturut-turut, +20 keempat, +30 kelima dan seterusnya. Salah atau petunjuk memutus combo. Mode Tantangan menambahkan `floor(sisaDetik / 90 × 20)`, maksimum 20, hanya untuk jawaban benar.
 
-- Satu tindakan utama pada tiap tahapan.
-- Opsi aktif ditandai dengan isi warna dan ikon centang.
-- Pesan kesalahan memberi langkah perbaikan dalam bahasa Indonesia.
-- Layout satu kolom pada layar sempit; dua kolom pada ruang kerja lebar.
-- Area konten dapat digulir dan menggunakan SafeArea.
-- Skor aktual menjadi pusat halaman hasil; tidak ada data peringkat rekaan.
+Timer dimulai saat layar kuis aktif, berhenti pada feedback, dan dijeda saat aplikasi tidak aktif atau pengguna keluar dari kuis. Waktu habis mengunci jawaban sebagai salah sekalipun draft sudah memuat kunci. Latihan mereset poin/attempts dan hanya membawa profil/mode; hasil latihan tidak menimpa hasil lama sebagai peningkatan akurasi historis.
 
-## 8. Kriteria penerimaan
+## 7. Kriteria penerimaan
 
-- Keempat layar dapat diakses melalui alur yang berfungsi.
-- Input nama kosong atau spasi ditolak.
-- Selanjutnya nonaktif sampai ada pilihan.
-- Jawaban tersimpan setelah rotasi, pergantian tema, dan navigasi kembali.
-- Seluruh soal harus dijawab untuk mencapai hasil.
-- Main Lagi menghapus nama, pilihan, progress, dan status selesai.
-- Skor 0, 80, dan 100 dihitung dengan benar.
-- Tidak ada overflow pada ukuran yang dicatat di `docs/testing.md`.
-- `flutter analyze` dan pengujian otomatis lulus.
-- Dokumentasi dan histori Git tersedia secara lokal.
+- Tiga misi dan maraton dapat diselesaikan; ketujuh bentuk jawaban dievaluasi dengan ID stabil.
+- Nama kosong/spasi ditolak; jawaban tidak lengkap memblokir kirim.
+- Submit berulang tidak menggandakan poin dan jawaban terkirim tidak berubah.
+- Hasil 12 benar Santai tanpa petunjuk: 100%, 1.470 poin, combo terbaik 12.
+- Petunjuk memengaruhi poin dan combo, bukan validitas/akurasi jawaban.
+- Rotasi/tema/back-resume mempertahankan draft, petunjuk, dan progress.
+- Latihan hanya berisi puzzle salah/waktu habis; Main Lagi menghasilkan input kosong.
+- Timer pause/resume serta penolakan submit terlambat diuji.
+- Drag-and-drop dan alternatif tap berfungsi; tidak ada overflow pada seluruh tipe di landscape kecil dengan teks diperbesar.
+- Analyze, tes, build dan bukti emulator dicatat terpisah dalam docs/testing-v2.md.
+- Dokumentasi dan commit bertahap tersedia pada drive D.
 
-## 9. Batas produk
+## 8. Batas dan lanjutan
 
-Data sesi disimpan di memori selama aplikasi berjalan. Menutup paksa aplikasi atau memuat ulang web memulai sesi baru. Tidak ada login, backend, leaderboard, penyimpanan permanen, analytics, atau sinkronisasi. Web adalah pratinjau tambahan; Android adalah target utama. iOS belum dibuat.
-
-## 10. Risiko dan tindak lanjut
-
-Bank soal harus ditinjau ketika topik diganti. Pengujian pada Android fisik diperlukan sebelum distribusi resmi. Nilai tugas ditentukan dosen; desain lengkap tidak merupakan jaminan nilai tertentu. Publikasi GitHub membutuhkan remote yang ditentukan pemilik proyek.
+Sesi lokal di memori; bukan layanan online. Room multiplayer, leaderboard, persistence, histori, authoring soal, akun, dan mode tim berada di luar versi ini. Android fisik serta distribusi release belum diverifikasi. Nilai tugas mengikuti penilaian dosen; tidak ada klaim jaminan nilai.

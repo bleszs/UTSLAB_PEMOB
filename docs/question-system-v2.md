@@ -1,6 +1,6 @@
 # Sistem pertanyaan v2 — puzzle berbasis misi
 
-Status: spesifikasi dan bank contoh untuk konsep Quizora Quest, belum menjadi fitur APK. Seluruh situasi adalah fiksi. Tema sementara: logika kehidupan kampus.
+Status: spesifikasi dan bank puzzle yang diterapkan pada source Quizora Quest v2. Seluruh situasi adalah fiksi. Tema: logika kehidupan kampus. Verifikasi dan status APK tercatat di `testing-v2.md`.
 
 ## Struktur data dan interaksi
 

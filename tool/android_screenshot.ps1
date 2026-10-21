@@ -32,5 +32,8 @@ $taskCaptureMetadata = @{
     fontScale = (& $taskAdb -s $Serial shell settings get system font_scale) -join ''
     rotation = (& $taskAdb -s $Serial shell settings get system user_rotation) -join ''
 }
+if (-not $taskCaptureMetadata.sdk -or -not $taskCaptureMetadata.density -or -not $taskCaptureMetadata.fontScale -or -not $taskCaptureMetadata.rotation) {
+    throw 'Metadata capture Android tidak lengkap; koneksi perlu dipulihkan lalu capture diulang.'
+}
 [System.IO.File]::WriteAllText((Join-Path $taskCaptureDir "$Name.json"), ($taskCaptureMetadata | ConvertTo-Json), [System.Text.UTF8Encoding]::new($false))
 Write-Output $taskOutput

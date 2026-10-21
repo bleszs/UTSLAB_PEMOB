@@ -116,11 +116,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 children: [
                   _Feature(
                     icon: Icons.layers_outlined,
-                    label: '12 puzzle · 3 misi',
+                    label: '16 puzzle · 4 misi',
                   ),
                   const _Feature(
                     icon: Icons.timer_outlined,
-                    label: '7 cara bermain',
+                    label: '8 cara bermain',
                   ),
                 ],
               ),

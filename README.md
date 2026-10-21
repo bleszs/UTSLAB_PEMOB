@@ -1,12 +1,12 @@
 # Quizora Quest
 
-Aplikasi puzzle Flutter berbahasa Indonesia untuk UTS Laboratorium Pemrograman Mobile. Versi 2 mengembangkan kuis menjadi permainan penyelidikan kampus: 3 misi, 12 puzzle, dan 7 bentuk interaksi. Ungu/kuning, Nunito lokal, ilustrasi edukasi/piala 3D, dan tema terang/gelap tetap mengikuti brief pengguna.
+Aplikasi kuis Flutter berbahasa Indonesia untuk UTS Laboratorium Pemrograman Mobile. Inti sesuai tema: pengguna memasukkan nama, menjawab serangkaian soal **pilihan ganda**, lalu melihat skor akhir. Versi 2 memperkaya kuis menjadi permainan penyelidikan kampus: 4 misi, 16 puzzle, dan 8 bentuk interaksi (termasuk satu misi khusus **Kuis Pilihan Ganda** klasik A/B/C/D). Ungu/kuning, Nunito lokal, ilustrasi edukasi/piala 3D, dan tema terang/gelap tetap mengikuti brief pengguna.
 
 ## Fitur
 
 - Profil lokal: nama, avatar Penjelajah/Detektif/Perakit, mode Santai atau Tantangan.
-- Misi Selamatkan Presentasi, Detektif Jadwal, dan Kunci Ruang Lab; masing-masing 4 puzzle. Maraton menggabungkan seluruh 12 puzzle.
-- Susun urutan, pilih bukti pada dokumen, pasangkan informasi, kelompokkan catatan, pilih beberapa jawaban, rakit kode, dan putuskan langkah skenario.
+- Misi Selamatkan Presentasi, Detektif Jadwal, Kunci Ruang Lab, dan Kuis Pilihan Ganda; masing-masing 4 puzzle. Maraton menggabungkan seluruh 16 puzzle.
+- Pilihan ganda klasik (pilih satu jawaban A/B/C/D), susun urutan, pilih bukti pada dokumen, pasangkan informasi, kelompokkan catatan, pilih beberapa jawaban, rakit kode, dan putuskan langkah skenario.
 - Drag-and-drop tersedia pada urutan, pasangan, kategori, dan kode; tombol/tap menyediakan alternatif.
 - Kirim jawaban sekali, lalu baca feedback dan penjelasan. Jawaban terkirim dikunci.
 - Poin, combo, petunjuk, suara klik yang dapat dimatikan, serta timer 90 detik/puzzle dalam mode Tantangan.

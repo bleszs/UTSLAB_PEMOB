@@ -6,6 +6,7 @@ enum QuestionType {
   multiSelect,
   codeBuilder,
   scenario,
+  multipleChoice,
 }
 
 enum GameMode { relaxed, challenge }
@@ -57,6 +58,7 @@ class Question {
     QuestionType.multiSelect => 'Pilih kombinasi',
     QuestionType.codeBuilder => 'Rakit kode',
     QuestionType.scenario => 'Ambil keputusan',
+    QuestionType.multipleChoice => 'Pilihan ganda',
   };
   List<String> get initialAnswer => switch (type) {
     QuestionType.sequence => items.map((item) => item.id).toList(),
@@ -73,7 +75,9 @@ class Question {
         answer.length == items.length &&
             answer.toSet().length == items.length &&
             answer.every(ids.contains),
-      QuestionType.hotspot || QuestionType.scenario =>
+      QuestionType.hotspot ||
+      QuestionType.scenario ||
+      QuestionType.multipleChoice =>
         answer.length == 1 && ids.contains(answer.single),
       QuestionType.multiSelect =>
         answer.length == answerKey.length &&

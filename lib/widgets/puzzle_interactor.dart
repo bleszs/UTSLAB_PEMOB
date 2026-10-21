@@ -23,7 +23,9 @@ class PuzzleInteractor extends StatelessWidget {
     QuestionType.hotspot => _document(context),
     QuestionType.matching => _matching(context),
     QuestionType.categorize => _categorize(context),
-    QuestionType.multiSelect || QuestionType.scenario => _choices(context),
+    QuestionType.multiSelect ||
+    QuestionType.scenario ||
+    QuestionType.multipleChoice => _choices(context),
     QuestionType.codeBuilder => _code(context),
   };
   Widget _sequence(BuildContext context) {
@@ -199,7 +201,10 @@ class PuzzleInteractor extends StatelessWidget {
 
   Widget _choices(BuildContext context) {
     final multi = quiz.current.type == QuestionType.multiSelect;
+    // Pilihan ganda klasik: beri label huruf A, B, C, D pada tiap opsi.
+    final lettered = quiz.current.type == QuestionType.multipleChoice;
     final answer = quiz.answer;
+    final items = quiz.current.items;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -211,16 +216,18 @@ class PuzzleInteractor extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
-        for (final item in quiz.current.items)
+        for (var i = 0; i < items.length; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: PuzzleChoice(
-              item: item,
-              selected: answer.contains(item.id),
+              item: items[i],
+              selected: answer.contains(items[i].id),
               multi: multi,
+              badge: lettered ? String.fromCharCode(65 + i) : null,
               onTap: quiz.submitted
                   ? null
                   : () {
+                      final item = items[i];
                       if (!multi) {
                         quiz.updateAnswer([item.id]);
                         return;
@@ -475,11 +482,13 @@ class PuzzleChoice extends StatelessWidget {
     required this.selected,
     required this.onTap,
     this.multi = false,
+    this.badge,
   });
   final PuzzleItem item;
   final bool selected;
   final VoidCallback? onTap;
   final bool multi;
+  final String? badge;
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -490,7 +499,8 @@ class PuzzleChoice extends StatelessWidget {
       enabled: onTap != null,
       onTap: onTap,
       label:
-          'Pilih ${item.label}${item.detail.isEmpty ? '' : ': ${item.detail}'}',
+          'Pilih ${badge == null ? '' : 'opsi $badge, '}${item.label}'
+          '${item.detail.isEmpty ? '' : ': ${item.detail}'}',
       child: ExcludeSemantics(
         child: Material(
           color: selected ? scheme.primary : scheme.surface,
@@ -507,6 +517,24 @@ class PuzzleChoice extends StatelessWidget {
               padding: const EdgeInsets.all(18),
               child: Row(
                 children: [
+                  if (badge != null) ...[
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: selected
+                          ? scheme.onPrimary
+                          : scheme.primaryContainer,
+                      child: Text(
+                        badge!,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: selected
+                                  ? scheme.primary
+                                  : scheme.onPrimaryContainer,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                  ],
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

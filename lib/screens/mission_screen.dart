@@ -38,7 +38,7 @@ class MissionScreen extends StatelessWidget {
         title: 'Pilih petualangan',
       ),
       footer: CustomPrimaryButton(
-        label: 'Maraton 12 Puzzle',
+        label: 'Maraton ${questions.length} Puzzle',
         icon: Icons.bolt_rounded,
         onPressed: () => _start(context),
       ),
@@ -72,11 +72,12 @@ class MissionScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        [
+                        const [
                           Icons.slideshow_rounded,
                           Icons.event_note_rounded,
                           Icons.lock_outline_rounded,
-                        ][i],
+                          Icons.fact_check_outlined,
+                        ][i % 4],
                         color: theme.colorScheme.primary,
                         size: 32,
                       ),
@@ -95,7 +96,20 @@ class MissionScreen extends StatelessWidget {
                               style: theme.textTheme.bodyMedium,
                             ),
                             const SizedBox(height: 8),
-                            const Text('4 puzzle · 4 jenis tantangan'),
+                            Builder(
+                              builder: (_) {
+                                final mq = questions
+                                    .where((q) => q.missionId == missions[i].id)
+                                    .toList();
+                                final jenis = mq
+                                    .map((q) => q.type)
+                                    .toSet()
+                                    .length;
+                                return Text(
+                                  '${mq.length} puzzle · $jenis jenis tantangan',
+                                );
+                              },
+                            ),
                           ],
                         ),
                       ),

@@ -15,9 +15,9 @@ void main() {
     expect(quiz.submit(), true);
   }
 
-  test('all seven evaluators reject incomplete, duplicate and unknown IDs', () {
+  test('all eight evaluators reject incomplete, duplicate and unknown IDs', () {
     expect(questions.map((q) => q.type).toSet(), QuestionType.values.toSet());
-    expect(questions.map((q) => q.id).toSet().length, 12);
+    expect(questions.map((q) => q.id).toSet().length, 16);
     for (final q in questions) {
       expect(q.evaluate(q.answerKey), true, reason: q.id);
       expect(q.evaluate([]), false);
@@ -76,14 +76,14 @@ void main() {
     final quiz = create();
     quiz.setPlayer('Ayu');
     quiz.startMission();
-    for (var i = 0; i < 12; i++) {
+    for (var i = 0; i < 16; i++) {
       solve(quiz);
       quiz.next();
     }
     expect(quiz.completed, true);
     expect(quiz.score, 100);
-    expect(quiz.points, 1470);
-    expect(quiz.bestStreak, 12);
+    expect(quiz.points, 1990);
+    expect(quiz.bestStreak, 16);
     expect(quiz.startPractice(), false);
     quiz.setPlayer('Bela');
     quiz.startMission(missionId: 'presentation');

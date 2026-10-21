@@ -16,6 +16,11 @@ const missions = [
     'Kunci Ruang Lab',
     'Gabungkan petunjuk untuk merakit kode dan membuka terminal.',
   ),
+  Mission(
+    'quiz',
+    'Kuis Pilihan Ganda',
+    'Jawab empat soal pilihan ganda: baca cerita, pilih satu jawaban benar.',
+  ),
 ];
 const questions = <Question>[
   Question(
@@ -262,5 +267,81 @@ const questions = <Question>[
     hint: 'Kode harus cocok dan urutan tindakan juga harus benar.',
     explanation:
         'Masukkan kode 243 terlebih dahulu, kemudian Konfirmasi. Kode dan urutan tindakan harus sama-sama memenuhi aturan.',
+  ),
+  Question(
+    id: 'q13',
+    missionId: 'quiz',
+    type: QuestionType.multipleChoice,
+    title: 'Widget yang bisa berubah',
+    context:
+        'Tim membuat layar kuis yang skornya berubah saat pengguna menjawab. Nilai skor harus disimpan dan tampilannya diperbarui ketika berubah.',
+    instruction: 'Pilih satu jawaban yang benar.',
+    items: [
+      PuzzleItem('stateless', 'StatelessWidget'),
+      PuzzleItem('stateful', 'StatefulWidget'),
+      PuzzleItem('inherited', 'InheritedWidget'),
+      PuzzleItem('builder', 'LayoutBuilder'),
+    ],
+    answerKey: ['stateful'],
+    hint: 'Widget mana yang menyimpan state dan memanggil setState?',
+    explanation:
+        'StatefulWidget menyimpan data yang berubah dan memperbarui tampilan melalui setState. StatelessWidget tidak menyimpan state yang berubah.',
+  ),
+  Question(
+    id: 'q14',
+    missionId: 'quiz',
+    type: QuestionType.multipleChoice,
+    title: 'Pindah antar halaman',
+    context:
+        'Setelah mengisi nama di halaman awal, pengguna harus dibawa ke halaman soal. Aplikasi memakai navigasi berbasis tumpukan (stack).',
+    instruction: 'Pilih satu jawaban yang benar.',
+    items: [
+      PuzzleItem('navigator', 'Navigator.push'),
+      PuzzleItem('setstate', 'setState'),
+      PuzzleItem('print', 'debugPrint'),
+      PuzzleItem('pop', 'Navigator.pop'),
+    ],
+    answerKey: ['navigator'],
+    hint: 'Untuk membuka halaman baru, bukan menutup halaman.',
+    explanation:
+        'Navigator.push menambahkan halaman baru ke tumpukan. Navigator.pop justru menutup halaman dan kembali ke sebelumnya.',
+  ),
+  Question(
+    id: 'q15',
+    missionId: 'quiz',
+    type: QuestionType.multipleChoice,
+    title: 'Ukuran yang menyesuaikan layar',
+    context:
+        'Tampilan harus tetap rapi di ponsel kecil maupun tablet. Tim ingin mengambil lebar layar untuk menghitung tata letak, bukan memakai angka tetap.',
+    instruction: 'Pilih satu jawaban yang benar.',
+    items: [
+      PuzzleItem('hardcode', 'Menulis lebar tetap 400 piksel'),
+      PuzzleItem('mediaquery', 'MediaQuery.of(context).size'),
+      PuzzleItem('color', 'Theme warna'),
+      PuzzleItem('string', 'String nama layar'),
+    ],
+    answerKey: ['mediaquery'],
+    hint: 'Yang mana membaca ukuran perangkat saat runtime?',
+    explanation:
+        'MediaQuery memberi ukuran layar perangkat sehingga tata letak dapat menyesuaikan. Nilai piksel tetap membuat tampilan tidak responsif.',
+  ),
+  Question(
+    id: 'q16',
+    missionId: 'quiz',
+    type: QuestionType.multipleChoice,
+    title: 'Menyimpan data lokal sederhana',
+    context:
+        'Soal kuis cukup disimpan sebagai data contoh di dalam aplikasi. Tidak ada server dan tidak perlu basis data.',
+    instruction: 'Pilih satu jawaban yang benar.',
+    items: [
+      PuzzleItem('sql', 'Basis data SQL di server'),
+      PuzzleItem('cloud', 'Penyimpanan cloud online'),
+      PuzzleItem('dummy', 'Daftar data dummy di dalam kode'),
+      PuzzleItem('camera', 'Sensor kamera perangkat'),
+    ],
+    answerKey: ['dummy'],
+    hint: 'Soal meminta data lokal atau dummy, bukan database.',
+    explanation:
+        'Data dummy lokal di dalam kode sudah cukup untuk kuis ini, sesuai ketentuan tanpa basis data.',
   ),
 ];

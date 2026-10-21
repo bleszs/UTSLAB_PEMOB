@@ -40,6 +40,7 @@ Future<void> solveVisible(WidgetTester tester) async {
     case QuestionType.hotspot:
     case QuestionType.scenario:
     case QuestionType.multiSelect:
+    case QuestionType.multipleChoice:
       for (final id in q.answerKey) {
         await tapVisible(
           tester,
@@ -137,7 +138,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
   testWidgets(
-    'all seven interactions complete marathon, review and clean replay',
+    'all eight interactions complete marathon, review and clean replay',
     (tester) async {
       setSize(tester, const Size(390, 844));
       addTearDown(tester.view.resetPhysicalSize);
@@ -147,18 +148,18 @@ void main() {
       expect(find.text('Isi nama dulu, lalu pilih misi.'), findsOneWidget);
       await tester.enterText(find.byKey(const Key('name_input')), 'Ayu');
       await tapVisible(tester, find.text('Pilih Misi'));
-      await tapVisible(tester, find.text('Maraton 12 Puzzle'));
-      for (var i = 0; i < 12; i++) {
+      await tapVisible(tester, find.text('Maraton 16 Puzzle'));
+      for (var i = 0; i < 16; i++) {
         await solveVisible(tester);
         await tapVisible(tester, find.text('Kirim Jawaban'));
         expect(find.text('Buktinya cocok!'), findsOneWidget);
         await tapVisible(
           tester,
-          find.text(i == 11 ? 'Lihat Hasil' : 'Puzzle Berikutnya'),
+          find.text(i == 15 ? 'Lihat Hasil' : 'Puzzle Berikutnya'),
         );
       }
       expect(find.text('100%'), findsOneWidget);
-      expect(find.text('1470'), findsOneWidget);
+      expect(find.text('1990'), findsOneWidget);
       await tapVisible(tester, find.text('Lihat Pembahasan'));
       expect(find.text('Alur file yang tertukar'), findsOneWidget);
       await tapVisible(tester, find.byTooltip('Kembali'));
@@ -219,14 +220,14 @@ void main() {
         'Nama cukup panjang',
       );
       await tapVisible(tester, find.text('Pilih Misi'));
-      await tapVisible(tester, find.text('Maraton 12 Puzzle'));
-      for (var i = 0; i < 12; i++) {
+      await tapVisible(tester, find.text('Maraton 16 Puzzle'));
+      for (var i = 0; i < 16; i++) {
         await solveVisible(tester);
         expect(tester.takeException(), isNull);
         await tapVisible(tester, find.text('Kirim Jawaban'));
         await tapVisible(
           tester,
-          find.text(i == 11 ? 'Lihat Hasil' : 'Puzzle Berikutnya'),
+          find.text(i == 15 ? 'Lihat Hasil' : 'Puzzle Berikutnya'),
         );
       }
       expect(tester.takeException(), isNull);

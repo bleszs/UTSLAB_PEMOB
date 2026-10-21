@@ -261,7 +261,7 @@ class PuzzleFeedback extends StatelessWidget {
                     ? Icons.check_circle_outline_rounded
                     : (attempt.timedOut
                           ? Icons.timer_off_outlined
-                          : Icons.search_rounded),
+                          : Icons.cancel_outlined),
                 size: 40,
               ),
               const SizedBox(height: 12),

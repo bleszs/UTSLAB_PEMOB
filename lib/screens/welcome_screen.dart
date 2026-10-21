@@ -100,10 +100,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final wide = constraints.maxWidth >= 720;
+          // Landscape ponsel punya tinggi kecil: perkecil ilustrasi agar tidak
+          // terpotong dan tetap proporsional terhadap form.
+          final shortViewport = MediaQuery.sizeOf(context).height < 540;
+          final artHeight = wide ? (shortViewport ? 180.0 : 340.0) : 210.0;
           final art = Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              QuizArtwork(trophy: false, height: wide ? 340 : 210),
+              QuizArtwork(trophy: false, height: artHeight),
               const SizedBox(height: 20),
               Wrap(
                 alignment: WrapAlignment.center,
@@ -233,8 +237,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             padding: const EdgeInsets.only(top: 8, bottom: 28),
             child: wide
                 ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: art),
+                      Expanded(child: Center(child: art)),
                       const SizedBox(width: 56),
                       Expanded(child: intro),
                     ],

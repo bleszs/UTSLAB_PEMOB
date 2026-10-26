@@ -3,7 +3,9 @@ Quizora Quest adalah aplikasi edukasi berbasis Flutter yang mengajak pengguna me
 Proyek ini dibuat untuk memenuhi tugas mata kuliah/laboratorium Pemrograman Mobile.
 
 Nama	: Blessly Victory Deo Silaban
+
 NIM	  : 241401060
+
 Lab   : Pemrograman Mobile 5
 
 

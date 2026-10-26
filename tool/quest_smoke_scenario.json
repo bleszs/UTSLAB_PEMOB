@@ -1,0 +1,47 @@
+{
+  "total": 16,
+  "missionCount": 4,
+  "typeCount": 8,
+  "hintQuestionIds": [
+    "q09"
+  ],
+  "wrongAnswers": {
+    "q12": [
+      "wrong"
+    ]
+  },
+  "classicQuestions": [
+    {
+      "id": "q13",
+      "position": 13,
+      "choice": "B",
+      "label": "StatefulWidget"
+    },
+    {
+      "id": "q14",
+      "position": 14,
+      "choice": "A",
+      "label": "Navigator.push"
+    },
+    {
+      "id": "q15",
+      "position": 15,
+      "choice": "B",
+      "label": "MediaQuery.of(context).size"
+    },
+    {
+      "id": "q16",
+      "position": 16,
+      "choice": "C",
+      "label": "Daftar data dummy di dalam kode"
+    }
+  ],
+  "expected": {
+    "correct": 15,
+    "total": 16,
+    "accuracy": 94,
+    "points": 1650,
+    "bestCombo": 8,
+    "hints": 1
+  }
+}

@@ -1,9 +1,0 @@
-{
-    "sdk":  "35",
-    "serial":  "emulator-5554",
-    "rotation":  "0",
-    "capture":  "Android adb screencap",
-    "density":  "Physical density: 420",
-    "fontScale":  "1.0",
-    "size":  "Physical size: 1080x2400"
-}

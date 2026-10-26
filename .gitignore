@@ -31,6 +31,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+/android/build/
 /coverage/
 /.gradle-local/
 /.font-tools/
@@ -46,3 +47,15 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local documentation and development evidence (kept on disk)
+*.[mM][dD]
+*.[lL][oO][gG]
+/docs/
+/.impeccable/
+/references/
+/.vscode/
+/pengumpulan/
+/g
+/assets/fonts/Nunito-Variable.ttf
+/tool/prepare_fonts.py

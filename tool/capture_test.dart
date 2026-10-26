@@ -62,7 +62,7 @@ void main() {
       expect(tester.takeException(), isNull);
       await expectLater(
         find.byKey(const Key('capture')),
-        matchesGoldenFile('../docs/screenshots/quest/$name.png'),
+        matchesGoldenFile('../docs/screenshots/quest-16/$name.png'),
       );
     }
 

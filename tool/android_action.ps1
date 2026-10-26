@@ -15,7 +15,7 @@ if ($Inspect -and -not $Label -and -not $Choice -and -not $NameInput) {
 }
 $taskNode = $taskUi.SelectNodes('//node') | Where-Object {
     if ($NameInput) { $_.class -eq 'android.widget.EditText' }
-    elseif ($Choice) { $_.'content-desc' -match "^Pilihan ${Choice}:" }
+    elseif ($Choice) { $_.'content-desc' -match "^Pilih opsi ${Choice}," }
     else { $_.'content-desc' -eq $Label -or $_.text -eq $Label }
 } | Select-Object -Skip $Index -First 1
 if (-not $taskNode) { throw "Kontrol belum terlihat: $Label" }

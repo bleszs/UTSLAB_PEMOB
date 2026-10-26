@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../controllers/quiz_controller.dart';
 import '../models/question.dart';
 
-/// Seven puzzle renderers sharing controller-owned answers and accessible taps.
+/// Eight puzzle renderers sharing controller-owned answers and accessible taps.
 class PuzzleInteractor extends StatelessWidget {
   const PuzzleInteractor({super.key, required this.quiz});
   final QuizController quiz;

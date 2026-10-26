@@ -2,6 +2,7 @@ param([ValidateSet('Profile','Tablet','Phone')][string]$Stage = 'Tablet', [switc
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'env_d.ps1')
 $taskAdb = Join-Path $env:ANDROID_HOME 'platform-tools\adb.exe'
+$taskScenario = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'quest_smoke_scenario.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 function Read-Ui {
     for ($taskRetry = 0; $taskRetry -lt 3; $taskRetry++) {
         $taskDump = & $taskAdb -s emulator-5554 shell uiautomator dump /sdcard/quizora-ui.xml
@@ -36,7 +37,15 @@ function Tap([string]$Label, [switch]$Prefix) {
     }
     throw "Missing visible control: $Label"
 }
-function Capture([string]$Name) { & (Join-Path $PSScriptRoot 'android_screenshot.ps1') -Quest -Name $Name }
+function Scroll-ContentTop {
+    $taskDimensions = [regex]::Matches(((& $taskAdb -s emulator-5554 shell wm size) -join ''), '(\d+)x(\d+)') | Select-Object -Last 1
+    $taskScreenW = [int]$taskDimensions.Groups[1].Value
+    $taskScreenH = [int]$taskDimensions.Groups[2].Value
+    for ($taskScroll = 0; $taskScroll -lt 2; $taskScroll++) {
+        & $taskAdb -s emulator-5554 shell input swipe ([int]($taskScreenW*.55)) ([int]($taskScreenH*.32)) ([int]($taskScreenW*.55)) ([int]($taskScreenH*.72)) 350 | Out-Null
+    }
+}
+function Capture([string]$Name) { & (Join-Path $PSScriptRoot 'android_screenshot.ps1') -Quest16 -Name $Name }
 function Submit-Next {
     Tap 'Kirim Jawaban'
     $taskUi = Read-Ui
@@ -58,7 +67,7 @@ if ($Stage -eq 'Profile') {
     & $taskAdb -s emulator-5554 shell wm density 320 | Out-Null
     Start-Sleep -Seconds 2
     if (-not $ResumeAtHotspot) {
-        Tap 'Maraton 12 Puzzle'
+        Tap "Maraton $($taskScenario.total) Puzzle"
         Capture 'sequence-tablet'
         Tap 'Naikkan Unduh file'
         Tap 'Naikkan Unduh file'
@@ -137,10 +146,31 @@ if ($Stage -eq 'Profile') {
     Tap 'Pilih Masukkan 312' -Prefix
     Tap 'Kirim Jawaban'
     Capture 'feedback-wrong-phone'
-    Tap 'Lihat Hasil'
+    Tap 'Puzzle Berikutnya'
+    foreach ($taskClassic in $taskScenario.classicQuestions) {
+        Scroll-ContentTop
+        $taskUi = Read-Ui
+        $taskPosition = "Puzzle $($taskClassic.position) / $($taskScenario.total)"
+        if (-not $taskUi.OuterXml.Contains($taskPosition)) { throw "Wrong puzzle position: expected $taskPosition" }
+        Tap "Pilih opsi $($taskClassic.choice), $($taskClassic.label)" -Prefix
+        Capture "multiple-choice-$($taskClassic.id)-phone"
+        Tap 'Kirim Jawaban'
+        $taskUi = Read-Ui
+        if ($taskUi.OuterXml -notmatch 'Buktinya cocok!') { throw "Expected correct feedback on $($taskClassic.id)" }
+        if ($taskClassic.position -eq $taskScenario.total) {
+            Tap 'Lihat Hasil'
+        } else {
+            Tap 'Puzzle Berikutnya'
+        }
+    }
     Capture 'result-phone'
     $taskUi = Read-Ui
-    if ($taskUi.OuterXml -notmatch '92%' -or $taskUi.OuterXml -notmatch '1220') { throw 'Native result mismatch' }
+    $taskExpected = $taskScenario.expected
+    if (-not $taskUi.OuterXml.Contains("$($taskExpected.accuracy)%") -or
+        -not $taskUi.OuterXml.Contains("$($taskExpected.points)") -or
+        -not $taskUi.OuterXml.Contains("$($taskExpected.correct) dari $($taskExpected.total) puzzle benar")) {
+        throw 'Native result mismatch with quest_smoke_scenario.json'
+    }
     Tap 'Lihat Pembahasan'
     Capture 'review-phone'
     & $taskAdb -s emulator-5554 shell input keyevent 4 | Out-Null
@@ -159,5 +189,5 @@ if ($Stage -eq 'Profile') {
     $taskUi = Read-Ui
     $taskName = $taskUi.SelectNodes('//node') | Where-Object { $_.class -eq 'android.widget.EditText' } | Select-Object -First 1
     if (-not $taskName -or $taskName.text) { throw 'Replay name not empty' }
-    Write-Output 'PASS: 11/12 correct, 1220 points, hint; practice 1/1 correct; reset empty.'
+    Write-Output "PASS: $($taskExpected.correct)/$($taskExpected.total) correct, $($taskExpected.accuracy)%, $($taskExpected.points) points; practice 1/1 correct; reset empty."
 }

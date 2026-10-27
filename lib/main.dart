@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'controllers/quiz_controller.dart';
 import 'data/questions.dart';
+import 'data/bonus_questions.dart';
 import 'screens/welcome_screen.dart';
 import 'utils/app_theme.dart';
 
@@ -13,7 +14,10 @@ class QuizoraApp extends StatefulWidget {
 }
 
 class _QuizoraAppState extends State<QuizoraApp> with WidgetsBindingObserver {
-  final QuizController _quiz = QuizController(questions: questions);
+  final QuizController _quiz = QuizController(
+    questions: questions,
+    bonusQuestions: bonusQuestions,
+  );
   final ValueNotifier<ThemeMode> _theme = ValueNotifier(ThemeMode.system);
   @override
   void initState() {

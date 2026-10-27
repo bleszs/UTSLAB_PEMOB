@@ -8,7 +8,7 @@ import 'package:quizora/models/question.dart';
 
 void main() {
   test(
-    'Android smoke fixture agrees with all 16 puzzles, scoring and practice',
+    'Android smoke fixture agrees with all 16 multiple-choice questions, scoring and practice',
     () {
       final fixture =
           jsonDecode(File('tool/quest_smoke_scenario.json').readAsStringSync())

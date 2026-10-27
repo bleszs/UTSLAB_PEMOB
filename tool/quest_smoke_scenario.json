@@ -1,7 +1,7 @@
 {
   "total": 16,
   "missionCount": 4,
-  "typeCount": 8,
+  "typeCount": 1,
   "hintQuestionIds": [
     "q09"
   ],
@@ -11,6 +11,78 @@
     ]
   },
   "classicQuestions": [
+    {
+      "id": "q01",
+      "position": 1,
+      "choice": "B",
+      "label": "Unduh → Ekstrak → Buka → Periksa font"
+    },
+    {
+      "id": "q02",
+      "position": 2,
+      "choice": "D",
+      "label": "Total: Rp95.000"
+    },
+    {
+      "id": "q03",
+      "position": 3,
+      "choice": "A",
+      "label": "Ari–flashdisk; Bela–adaptor; Cika–laptop"
+    },
+    {
+      "id": "q04",
+      "position": 4,
+      "choice": "C",
+      "label": "Pasang charger yang tersedia"
+    },
+    {
+      "id": "q05",
+      "position": 5,
+      "choice": "B",
+      "label": "A dan B"
+    },
+    {
+      "id": "q06",
+      "position": 6,
+      "choice": "D",
+      "label": "Email konfirmasi dan daftar hadir"
+    },
+    {
+      "id": "q07",
+      "position": 7,
+      "choice": "C",
+      "label": "Briefing → Simulasi → Review → Evaluasi"
+    },
+    {
+      "id": "q08",
+      "position": 8,
+      "choice": "B",
+      "label": "Lab A pada pukul 09.30"
+    },
+    {
+      "id": "q09",
+      "position": 9,
+      "choice": "A",
+      "label": "243"
+    },
+    {
+      "id": "q10",
+      "position": 10,
+      "choice": "C",
+      "label": "B + C: 5 halaman, 12 MB"
+    },
+    {
+      "id": "q11",
+      "position": 11,
+      "choice": "D",
+      "label": "Merah 421 · Biru 312 · Hijau 243"
+    },
+    {
+      "id": "q12",
+      "position": 12,
+      "choice": "A",
+      "label": "Masukkan 243 → Konfirmasi"
+    },
     {
       "id": "q13",
       "position": 13,
@@ -43,5 +115,12 @@
     "points": 1650,
     "bestCombo": 8,
     "hints": 1
+  },
+  "bonusTotal": 12,
+  "wrongChoices": {
+    "q12": {
+      "choice": "D",
+      "label": "Masukkan 312 → Konfirmasi"
+    }
   }
 }

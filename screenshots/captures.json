@@ -1,0 +1,118 @@
+{
+  "capturedFor": "README and UI verification",
+  "date": "2026-10-27",
+  "images": [
+    {
+      "file": "01-welcome.png",
+      "width": 390,
+      "height": 1171,
+      "sha256": "f921fc948ce2d5bd70aab076ca850a77fec22613257992b20ebc593cf9cb47c9",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "02-missions.png",
+      "width": 390,
+      "height": 1320,
+      "sha256": "38c109b1e4c7ccb0a1aec632fce6b6c07e414ec7bf1de9eef3509cb69fba7562",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "03-feedback.png",
+      "width": 390,
+      "height": 967,
+      "sha256": "d46f61d02c41cf07030f85155bb7ec3d48a86c0d62c121025a9df5fea92296a0",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "03-quiz-selected.png",
+      "width": 390,
+      "height": 1035,
+      "sha256": "70c50bb76f64953d5964514541a5b2576bb1145fcb0ccb90559dc3940ef69939",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "03-quiz.png",
+      "width": 390,
+      "height": 1035,
+      "sha256": "4bee7db787e0667f67f653ed8a958188e1db124a9ac2e5ced7a3e6315b54add3",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "04-result.png",
+      "width": 390,
+      "height": 941,
+      "sha256": "1fc1d205ecb2bc945eab8efede665734a72a5c04dbb683dd6794dc00dce0d0ba",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "05-review.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "5476a04da223495234733e5ba5ba8f73ad801f395904a310aef698b47a21170e",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "06-tablet.png",
+      "width": 800,
+      "height": 1280,
+      "sha256": "a30e43928f49204ffa475cb31cf748086d7efdc1211b15b0998b569d7a57faf8",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "07-landscape.png",
+      "width": 844,
+      "height": 390,
+      "sha256": "606c40c0422eecd0480625c6b72b4d2670648bda87668e83e7d056a03242ed71",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "08-dark.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "4bd37cd036150ff6eec4f69cb16e22c7fd125310445aeda4fb3c184624684ebc",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "09-large-text.png",
+      "width": 568,
+      "height": 320,
+      "sha256": "5d8941769c8a994e464565adba8a586ec9184b9f0ca61f870ac1240b3bab7894",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "10-bonus.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "986d2523da5708279dc9f8215315792eab289913be4f6d544eb75f8aa3b2a8d2",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "11-timer.png",
+      "width": 390,
+      "height": 1001,
+      "sha256": "1965c2c1fea3ca2396c12a650632665e9af3f58a55fac4f76565927180eed938",
+      "source": "Flutter widget renderer: tool/capture_test.dart",
+      "appVersion": "3.0.0+3"
+    },
+    {
+      "file": "12-android-bluestacks.png",
+      "width": 1888,
+      "height": 1080,
+      "sha256": "905f14c24b00e5d6b8077fc27bd7fadbebef63f960fae2202e7c1494e155a62d",
+      "source": "Native Android in BlueStacks",
+      "appVersion": "3.0.0+3"
+    }
+  ]
+}

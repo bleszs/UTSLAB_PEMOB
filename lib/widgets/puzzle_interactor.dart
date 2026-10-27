@@ -137,7 +137,7 @@ class PuzzleInteractor extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    quiz.current.id == 'q02'
+                    quiz.current.id == 'bonus_q02'
                         ? 'Rincian biaya tim'
                         : 'Daftar reservasi',
                     style: Theme.of(context).textTheme.titleMedium,

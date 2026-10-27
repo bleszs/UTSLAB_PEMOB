@@ -1,4 +1,4 @@
-param([ValidateSet('Profile','Tablet','Phone')][string]$Stage = 'Tablet', [switch]$ResumeAtHotspot)
+param([ValidateSet('Profile','Tablet','Phone')][string]$Stage = 'Tablet', [Alias('ResumeAtHotspot')][switch]$ResumeAtSecondQuestion)
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'env_d.ps1')
 $taskAdb = Join-Path $env:ANDROID_HOME 'platform-tools\adb.exe'
@@ -46,14 +46,14 @@ function Scroll-ContentTop {
     }
 }
 function Capture([string]$Name) { & (Join-Path $PSScriptRoot 'android_screenshot.ps1') -Quest16 -Name $Name }
-function Submit-Next {
+function Submit-Next([bool]$ExpectedCorrect = $true, [bool]$Last = $false) {
     Tap 'Kirim Jawaban'
     $taskUi = Read-Ui
-    if ($taskUi.OuterXml -notmatch 'Buktinya cocok!') { throw 'Expected correct feedback' }
-    Tap 'Puzzle Berikutnya'
+    $taskMessage = if ($ExpectedCorrect) { 'Buktinya cocok!' } else { 'Belum tepat' }
+    if (-not $taskUi.OuterXml.Contains($taskMessage)) { throw "Unexpected feedback: $taskMessage" }
+    if ($Last) { Tap 'Lihat Hasil' } else { Tap 'Soal Berikutnya' }
 }
 if ($Stage -eq 'Profile') {
-    & $taskAdb -s emulator-5554 shell settings put secure stylus_handwriting_enabled 0 | Out-Null
     Capture 'welcome-phone'
     & (Join-Path $PSScriptRoot 'android_action.ps1') -NameInput
     & $taskAdb -s emulator-5554 shell input text Adit | Out-Null
@@ -62,113 +62,43 @@ if ($Stage -eq 'Profile') {
     Tap 'Detektif'
     Tap 'Pilih Misi'
     Capture 'missions-phone'
-} elseif ($Stage -eq 'Tablet') {
-    & $taskAdb -s emulator-5554 shell wm size 1600x2560 | Out-Null
-    & $taskAdb -s emulator-5554 shell wm density 320 | Out-Null
-    Start-Sleep -Seconds 2
-    if (-not $ResumeAtHotspot) {
-        Tap "Maraton $($taskScenario.total) Puzzle"
-        Capture 'sequence-tablet'
-        Tap 'Naikkan Unduh file'
-        Tap 'Naikkan Unduh file'
-        Tap 'Naikkan Ekstrak ZIP'
-        Tap 'Naikkan Ekstrak ZIP'
-        Submit-Next
-    }
-    Capture 'hotspot-tablet'
-    Tap 'Pilih Total: Rp95.000'
-    Submit-Next
-    Capture 'matching-tablet'
-    Tap 'Flashdisk'
-    Tap 'Adaptor'
-    Tap 'Laptop'
-    Submit-Next
-    Capture 'scenario-tablet'
-    Tap 'Pilih Pasang charger' -Prefix
-    Submit-Next
-    Capture 'multiselect-tablet'
-    Tap 'Pilih Kegiatan A' -Prefix
-    Tap 'Pilih Kegiatan B' -Prefix
-    Submit-Next
-    Tap 'Email konfirmasi ruangan diterima'
-    Tap 'Dosen mungkin datang terlambat'
-    Tap 'Dosen mungkin datang terlambat'
-    Tap 'Daftar hadir berisi 12 nama'
-    Tap 'Sepertinya proyektor akan rusak'
-    Tap 'Sepertinya proyektor akan rusak'
-    Capture 'categorize-tablet'
-    Submit-Next
-    Tap 'Naikkan Briefing'
-    Tap 'Naikkan Simulasi'
-    Tap 'Naikkan Simulasi'
-    Submit-Next
-    Tap 'Pilih Reservasi C:' -Prefix
-    Submit-Next
-    Write-Output 'PASS: first eight puzzles correct; code builder next.'
 } else {
-    & $taskAdb -s emulator-5554 shell wm size reset | Out-Null
-    & $taskAdb -s emulator-5554 shell wm density reset | Out-Null
-    Start-Sleep -Seconds 2
-    Tap 'Buka Petunjuk'
-    Tap '2'
-    Tap '4'
-    Capture 'code-partial-phone'
-    Tap 'Matikan suara'
-    Tap 'Kembali'
-    Tap 'Lanjutkan misi sebelumnya'
-    & $taskAdb -s emulator-5554 shell settings put system accelerometer_rotation 0 | Out-Null
-    & $taskAdb -s emulator-5554 shell settings put system user_rotation 1 | Out-Null
-    Start-Sleep -Seconds 2
-    Tap 'Aktifkan mode gelap'
-    Capture 'code-landscape-dark-phone'
-    $taskUi = Read-Ui
-    if ($taskUi.OuterXml -notmatch 'Slot 1: 2' -or $taskUi.OuterXml -notmatch 'Slot 2: 4') { throw 'Rotation lost partial code' }
-    Tap 'Aktifkan mode terang'
-    & $taskAdb -s emulator-5554 shell settings put system user_rotation 0 | Out-Null
-    & $taskAdb -s emulator-5554 shell settings put system accelerometer_rotation 1 | Out-Null
-    Start-Sleep -Seconds 2
-    & $taskAdb -s emulator-5554 shell settings put system font_scale 1.3 | Out-Null
-    Capture 'code-large-font-phone'
-    & $taskAdb -s emulator-5554 shell settings put system font_scale 1.0 | Out-Null
-    Tap '3'
-    Tap 'Kirim Jawaban'
-    Capture 'feedback-hint-phone'
-    $taskUi = Read-Ui
-    if ($taskUi.OuterXml -notmatch 'Buktinya cocok!' -or $taskUi.OuterXml -notmatch '70 poin') { throw 'Hint score wrong' }
-    Tap 'Puzzle Berikutnya'
-    Tap 'Pilih Dokumen B' -Prefix
-    Tap 'Pilih Dokumen C' -Prefix
-    Submit-Next
-    Tap '421'
-    Tap '312'
-    Tap '243'
-    Submit-Next
-    Tap 'Pilih Masukkan 312' -Prefix
-    Tap 'Kirim Jawaban'
-    Capture 'feedback-wrong-phone'
-    Tap 'Puzzle Berikutnya'
-    foreach ($taskClassic in $taskScenario.classicQuestions) {
+    if ($Stage -eq 'Tablet') {
+        & $taskAdb -s emulator-5554 shell wm size 1600x2560 | Out-Null
+        & $taskAdb -s emulator-5554 shell wm density 320 | Out-Null
+        Start-Sleep -Seconds 2
+        if (-not $ResumeAtSecondQuestion) { Tap "Maraton $($taskScenario.total) Soal" }
+        $taskFirst = if ($ResumeAtSecondQuestion) { 2 } else { 1 }
+        $taskLast = 8
+    } else {
+        & $taskAdb -s emulator-5554 shell wm size reset | Out-Null
+        & $taskAdb -s emulator-5554 shell wm density reset | Out-Null
+        Start-Sleep -Seconds 2
+        $taskFirst = 9
+        $taskLast = $taskScenario.total
+    }
+    foreach ($taskClassic in ($taskScenario.classicQuestions | Where-Object { $_.position -ge $taskFirst -and $_.position -le $taskLast })) {
         Scroll-ContentTop
         $taskUi = Read-Ui
-        $taskPosition = "Puzzle $($taskClassic.position) / $($taskScenario.total)"
-        if (-not $taskUi.OuterXml.Contains($taskPosition)) { throw "Wrong puzzle position: expected $taskPosition" }
-        Tap "Pilih opsi $($taskClassic.choice), $($taskClassic.label)" -Prefix
-        Capture "multiple-choice-$($taskClassic.id)-phone"
-        Tap 'Kirim Jawaban'
-        $taskUi = Read-Ui
-        if ($taskUi.OuterXml -notmatch 'Buktinya cocok!') { throw "Expected correct feedback on $($taskClassic.id)" }
-        if ($taskClassic.position -eq $taskScenario.total) {
-            Tap 'Lihat Hasil'
-        } else {
-            Tap 'Puzzle Berikutnya'
-        }
+        $taskPosition = "Soal $($taskClassic.position) / $($taskScenario.total)"
+        if (-not $taskUi.OuterXml.Contains($taskPosition)) { throw "Wrong question position: $taskPosition" }
+        if ($taskScenario.hintQuestionIds -contains $taskClassic.id) { Tap 'Buka Petunjuk' }
+        $taskWrong = $taskScenario.wrongChoices.PSObject.Properties[$taskClassic.id]
+        $taskChosen = if ($taskWrong) { $taskWrong.Value } else { $taskClassic }
+        Tap "Pilih opsi $($taskChosen.choice), $($taskChosen.label)" -Prefix
+        Capture "multiple-choice-$($taskClassic.id)-$($Stage.ToLower())"
+        Submit-Next -ExpectedCorrect (-not [bool]$taskWrong) -Last ($taskClassic.position -eq $taskScenario.total)
+    }
+    if ($Stage -eq 'Tablet') {
+        Write-Output 'PASS: first eight multiple-choice questions; question 9 next.'
+        return
     }
     Capture 'result-phone'
     $taskUi = Read-Ui
     $taskExpected = $taskScenario.expected
     if (-not $taskUi.OuterXml.Contains("$($taskExpected.accuracy)%") -or
         -not $taskUi.OuterXml.Contains("$($taskExpected.points)") -or
-        -not $taskUi.OuterXml.Contains("$($taskExpected.correct) dari $($taskExpected.total) puzzle benar")) {
+        -not $taskUi.OuterXml.Contains("$($taskExpected.correct) dari $($taskExpected.total) soal benar")) {
         throw 'Native result mismatch with quest_smoke_scenario.json'
     }
     Tap 'Lihat Pembahasan'
@@ -177,17 +107,18 @@ if ($Stage -eq 'Profile') {
     Tap 'Latih yang Belum Tepat'
     Capture 'practice-phone'
     $taskUi = Read-Ui
-    if ($taskUi.OuterXml -notmatch 'Puzzle 1 / 1') { throw 'Practice subset mismatch' }
-    Tap 'Pilih Masukkan 243' -Prefix
-    Tap 'Kirim Jawaban'
-    Tap 'Lihat Hasil'
+    if (-not $taskUi.OuterXml.Contains('Soal 1 / 1')) { throw 'Practice subset mismatch' }
+    $taskPracticeId = ($taskScenario.wrongChoices.PSObject.Properties | Select-Object -First 1).Name
+    $taskPractice = $taskScenario.classicQuestions | Where-Object { $_.id -eq $taskPracticeId } | Select-Object -First 1
+    Tap "Pilih opsi $($taskPractice.choice), $($taskPractice.label)" -Prefix
+    Submit-Next -Last $true
     Capture 'practice-result-phone'
     $taskUi = Read-Ui
-    if ($taskUi.OuterXml -notmatch '100%') { throw 'Practice result mismatch' }
+    if (-not $taskUi.OuterXml.Contains('100%')) { throw 'Practice result mismatch' }
     Tap 'Main Lagi'
     Capture 'reset-phone'
     $taskUi = Read-Ui
     $taskName = $taskUi.SelectNodes('//node') | Where-Object { $_.class -eq 'android.widget.EditText' } | Select-Object -First 1
     if (-not $taskName -or $taskName.text) { throw 'Replay name not empty' }
-    Write-Output "PASS: $($taskExpected.correct)/$($taskExpected.total) correct, $($taskExpected.accuracy)%, $($taskExpected.points) points; practice 1/1 correct; reset empty."
+    Write-Output "PASS: $($taskExpected.correct)/$($taskExpected.total) correct, $($taskExpected.accuracy)%, $($taskExpected.points) points; practice 1/1; reset empty."
 }

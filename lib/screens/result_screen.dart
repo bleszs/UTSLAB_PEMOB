@@ -82,7 +82,7 @@ class ResultScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${quiz.correct} dari ${quiz.total} puzzle benar',
+                      '${quiz.correct} dari ${quiz.total} ${quiz.isBonus ? 'puzzle' : 'soal'} benar',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: Colors.white,
                       ),
@@ -107,7 +107,7 @@ class ResultScreen extends StatelessWidget {
               Text(
                 quiz.incorrect.isEmpty
                     ? 'Semua petunjuk terpecahkan. Siap mencoba misi lain?'
-                    : '${quiz.incorrect.length} puzzle bisa kamu latih lagi${quiz.timedOutCount > 0 ? ' · ${quiz.timedOutCount} waktu habis' : ''}.',
+                    : '${quiz.incorrect.length} ${quiz.isBonus ? 'puzzle' : 'soal'} bisa kamu latih lagi${quiz.timedOutCount > 0 ? ' · ${quiz.timedOutCount} waktu habis' : ''}.',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),

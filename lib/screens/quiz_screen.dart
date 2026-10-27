@@ -76,7 +76,11 @@ class _QuizScreenState extends State<QuizScreen> {
         ),
         footer: CustomPrimaryButton(
           label: quiz.submitted
-              ? (quiz.isLast ? 'Lihat Hasil' : 'Puzzle Berikutnya')
+              ? (quiz.isLast
+                    ? 'Lihat Hasil'
+                    : quiz.isBonus
+                    ? 'Puzzle Berikutnya'
+                    : 'Soal Berikutnya')
               : 'Kirim Jawaban',
           icon: quiz.submitted
               ? Icons.arrow_forward_rounded
@@ -94,7 +98,7 @@ class _QuizScreenState extends State<QuizScreen> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Text(
-                  'Puzzle ${quiz.index + 1} / ${quiz.total}',
+                  '${quiz.isBonus ? 'Puzzle' : 'Soal'} ${quiz.index + 1} / ${quiz.total}',
                   style: theme.textTheme.titleMedium,
                 ),
                 Text('${quiz.points} poin', style: theme.textTheme.titleMedium),

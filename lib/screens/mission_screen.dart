@@ -14,12 +14,18 @@ class MissionScreen extends StatelessWidget {
   });
   final QuizController quiz;
   final VoidCallback onToggleTheme;
+
   void _start(
     BuildContext context, {
     String? id,
-    String title = 'Maraton semua misi',
+    String title = 'Maraton Pilihan Ganda',
+    bool bonus = false,
   }) {
-    quiz.startMission(missionId: id, title: title);
+    if (bonus) {
+      quiz.startBonus();
+    } else {
+      quiz.startMission(missionId: id, title: title);
+    }
     Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
         builder: (_) => QuizScreen(quiz: quiz, onToggleTheme: onToggleTheme),
@@ -35,10 +41,10 @@ class MissionScreen extends StatelessWidget {
         dark: theme.brightness == Brightness.dark,
         onToggleTheme: onToggleTheme,
         onBack: () => Navigator.of(context).pop(),
-        title: 'Pilih petualangan',
+        title: 'Pilih misi kuis',
       ),
       footer: CustomPrimaryButton(
-        label: 'Maraton ${questions.length} Puzzle',
+        label: 'Maraton ${quiz.bank.length} Soal',
         icon: Icons.bolt_rounded,
         onPressed: () => _start(context),
       ),
@@ -52,7 +58,7 @@ class MissionScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Setiap misi berisi empat puzzle. Semua informasi yang kamu butuhkan ada dalam cerita.',
+            'Setiap misi berisi empat soal pilihan ganda. Baca cerita dan pilih satu jawaban A, B, C, atau D.',
             style: theme.textTheme.bodyLarge,
           ),
           const SizedBox(height: 28),
@@ -96,19 +102,8 @@ class MissionScreen extends StatelessWidget {
                               style: theme.textTheme.bodyMedium,
                             ),
                             const SizedBox(height: 8),
-                            Builder(
-                              builder: (_) {
-                                final mq = questions
-                                    .where((q) => q.missionId == missions[i].id)
-                                    .toList();
-                                final jenis = mq
-                                    .map((q) => q.type)
-                                    .toSet()
-                                    .length;
-                                return Text(
-                                  '${mq.length} puzzle · $jenis jenis tantangan',
-                                );
-                              },
+                            Text(
+                              '${quiz.bank.where((q) => q.missionId == missions[i].id).length} soal · pilihan ganda A–D',
                             ),
                           ],
                         ),
@@ -124,6 +119,28 @@ class MissionScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 18),
+          ],
+          if (quiz.bonusBank.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text('Tantangan tambahan', style: theme.textTheme.titleLarge),
+            const SizedBox(height: 8),
+            Text(
+              'Opsional: ${quiz.bonusBank.length} puzzle interaktif dengan susun urutan, cocokkan bukti, dan rakit kode. Sesi dan skornya terpisah dari kuis pilihan ganda.',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                key: const Key('bonus_zone'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(56),
+                ),
+                onPressed: () => _start(context, bonus: true),
+                icon: const Icon(Icons.extension_outlined),
+                label: const Text('Zona Puzzle Bonus'),
+              ),
+            ),
           ],
           const SizedBox(height: 12),
         ],

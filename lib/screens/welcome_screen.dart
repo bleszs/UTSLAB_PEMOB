@@ -116,11 +116,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 children: [
                   _Feature(
                     icon: Icons.layers_outlined,
-                    label: '16 puzzle · 4 misi',
+                    label: '${widget.quiz.bank.length} soal · 4 misi',
                   ),
                   const _Feature(
-                    icon: Icons.timer_outlined,
-                    label: '8 cara bermain',
+                    icon: Icons.fact_check_outlined,
+                    label: 'Pilihan ganda A–D',
                   ),
                 ],
               ),
@@ -138,7 +138,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  'Susun alur, temukan bukti, dan pecahkan kode dalam misi kehidupan kampus.',
+                  'Baca cerita kampus, telusuri petunjuk, lalu pilih satu jawaban yang paling tepat.',
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
@@ -219,7 +219,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 Text(
                   _mode == GameMode.relaxed
                       ? 'Tanpa timer. Ambil waktu untuk memahami petunjuk.'
-                      : '90 detik per puzzle. Timer dijeda saat aplikasi ditinggalkan.',
+                      : '90 detik per soal. Timer dijeda saat aplikasi ditinggalkan.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 18),

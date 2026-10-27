@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quizora/main.dart';
 import 'package:quizora/controllers/quiz_controller.dart';
 import 'package:quizora/data/questions.dart';
+import 'package:quizora/data/bonus_questions.dart';
 import 'package:quizora/models/question.dart';
 import 'package:quizora/widgets/puzzle_interactor.dart';
 
@@ -57,6 +58,38 @@ void setSize(WidgetTester tester, Size value) {
 }
 
 void main() {
+  testWidgets(
+    'bonus zone is optional and keeps the original interactions separate',
+    (tester) async {
+      setSize(tester, const Size(390, 844));
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(const QuizoraApp());
+      await tester.enterText(find.byKey(const Key('name_input')), 'Ayu');
+      await tapVisible(tester, find.text('Pilih Misi'));
+      await tapVisible(tester, find.byKey(const Key('bonus_zone')));
+      final quiz = tester
+          .widget<PuzzleInteractor>(find.byType(PuzzleInteractor))
+          .quiz;
+      expect(quiz.isBonus, true);
+      expect(quiz.total, 12);
+      for (var i = 0; i < 12; i++) {
+        await solveVisible(tester);
+        await tapVisible(tester, find.text('Kirim Jawaban'));
+        await tapVisible(
+          tester,
+          find.text(i == 11 ? 'Lihat Hasil' : 'Puzzle Berikutnya'),
+        );
+      }
+      expect(find.text('100%'), findsOneWidget);
+      expect(quiz.bank.length, 16);
+      await tapVisible(tester, find.text('Main Lagi'));
+      expect(quiz.isBonus, false);
+      expect(quiz.total, 16);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('semantic tap activates hotspot and choices and respects lock', (
     tester,
   ) async {
@@ -65,7 +98,11 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     final semantics = tester.ensureSemantics();
     try {
-      for (final q in [questions[1], questions[4], questions[3]]) {
+      for (final q in [
+        bonusQuestions[1],
+        bonusQuestions[4],
+        bonusQuestions[3],
+      ]) {
         final quiz = QuizController(questions: [q])
           ..setPlayer('Ayu')
           ..startMission();
@@ -109,7 +146,7 @@ void main() {
     setSize(tester, const Size(390, 844));
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    final quiz = QuizController(questions: [questions[8]])
+    final quiz = QuizController(questions: [bonusQuestions[8]])
       ..setPlayer('Ayu')
       ..startMission();
     addTearDown(quiz.dispose);
@@ -138,7 +175,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
   testWidgets(
-    'all eight interactions complete marathon, review and clean replay',
+    'all sixteen multiple-choice questions complete marathon, review and clean replay',
     (tester) async {
       setSize(tester, const Size(390, 844));
       addTearDown(tester.view.resetPhysicalSize);
@@ -148,14 +185,22 @@ void main() {
       expect(find.text('Isi nama dulu, lalu pilih misi.'), findsOneWidget);
       await tester.enterText(find.byKey(const Key('name_input')), 'Ayu');
       await tapVisible(tester, find.text('Pilih Misi'));
-      await tapVisible(tester, find.text('Maraton 16 Puzzle'));
+      await tapVisible(tester, find.text('Maraton 16 Soal'));
       for (var i = 0; i < 16; i++) {
+        final active = tester
+            .widget<PuzzleInteractor>(find.byType(PuzzleInteractor))
+            .quiz;
+        expect(active.current.type, QuestionType.multipleChoice);
+        expect(find.text('A'), findsOneWidget);
+        expect(find.text('B'), findsOneWidget);
+        expect(find.text('C'), findsOneWidget);
+        expect(find.text('D'), findsOneWidget);
         await solveVisible(tester);
         await tapVisible(tester, find.text('Kirim Jawaban'));
         expect(find.text('Buktinya cocok!'), findsOneWidget);
         await tapVisible(
           tester,
-          find.text(i == 15 ? 'Lihat Hasil' : 'Puzzle Berikutnya'),
+          find.text(i == 15 ? 'Lihat Hasil' : 'Soal Berikutnya'),
         );
       }
       expect(find.text('100%'), findsOneWidget);
@@ -177,7 +222,7 @@ void main() {
     },
   );
   testWidgets(
-    'code tokens survive landscape, theme and leaving/resuming a mission',
+    'selected choice survives landscape, theme and leaving/resuming a mission',
     (tester) async {
       setSize(tester, const Size(390, 844));
       addTearDown(tester.view.resetPhysicalSize);
@@ -186,20 +231,21 @@ void main() {
       await tester.enterText(find.byKey(const Key('name_input')), 'Ayu');
       await tapVisible(tester, find.text('Pilih Misi'));
       await tapVisible(tester, find.text('Kunci Ruang Lab'));
-      await tapVisible(tester, find.widgetWithText(ActionChip, '2'));
+      await tapVisible(tester, find.text('243'));
       final quiz = tester
           .widget<PuzzleInteractor>(find.byType(PuzzleInteractor))
           .quiz;
       setSize(tester, const Size(844, 390));
       await tester.pumpAndSettle();
-      expect(quiz.answer, ['2', '', '']);
+      expect(quiz.answer, ['243']);
       await tapVisible(tester, find.byTooltip('Aktifkan mode gelap'));
-      expect(quiz.answer, ['2', '', '']);
+      expect(quiz.answer, ['243']);
       await tapVisible(tester, find.byTooltip('Kembali'));
       await tapVisible(tester, find.text('Lanjutkan misi sebelumnya'));
-      expect(quiz.answer, ['2', '', '']);
-      await tapVisible(tester, find.widgetWithText(ActionChip, '4'));
-      await tapVisible(tester, find.widgetWithText(ActionChip, '3'));
+      expect(quiz.answer, ['243']);
+      await tapVisible(tester, find.text('234'));
+      expect(quiz.answer, ['234']);
+      await tapVisible(tester, find.text('243'));
       await tapVisible(tester, find.text('Buka Petunjuk'));
       await tapVisible(tester, find.text('Kirim Jawaban'));
       expect(quiz.attempt!.points, 70);
@@ -220,14 +266,14 @@ void main() {
         'Nama cukup panjang',
       );
       await tapVisible(tester, find.text('Pilih Misi'));
-      await tapVisible(tester, find.text('Maraton 16 Puzzle'));
+      await tapVisible(tester, find.text('Maraton 16 Soal'));
       for (var i = 0; i < 16; i++) {
         await solveVisible(tester);
         expect(tester.takeException(), isNull);
         await tapVisible(tester, find.text('Kirim Jawaban'));
         await tapVisible(
           tester,
-          find.text(i == 15 ? 'Lihat Hasil' : 'Puzzle Berikutnya'),
+          find.text(i == 15 ? 'Lihat Hasil' : 'Soal Berikutnya'),
         );
       }
       expect(tester.takeException(), isNull);
@@ -243,20 +289,21 @@ void main() {
       await tester.enterText(find.byKey(const Key('name_input')), 'Bela');
       await tapVisible(tester, find.text('Pilih Misi'));
       await tapVisible(tester, find.text('Selamatkan Presentasi'));
+      await tapVisible(tester, find.text(questions.first.items.first.label));
       await tapVisible(tester, find.text('Kirim Jawaban'));
       expect(find.text('Belum tepat'), findsOneWidget);
-      await tapVisible(tester, find.text('Puzzle Berikutnya'));
+      await tapVisible(tester, find.text('Soal Berikutnya'));
       for (var i = 0; i < 3; i++) {
         await solveVisible(tester);
         await tapVisible(tester, find.text('Kirim Jawaban'));
         await tapVisible(
           tester,
-          find.text(i == 2 ? 'Lihat Hasil' : 'Puzzle Berikutnya'),
+          find.text(i == 2 ? 'Lihat Hasil' : 'Soal Berikutnya'),
         );
       }
       expect(find.text('75%'), findsOneWidget);
       await tapVisible(tester, find.text('Latih yang Belum Tepat'));
-      expect(find.text('Puzzle 1 / 1'), findsOneWidget);
+      expect(find.text('Soal 1 / 1'), findsOneWidget);
       await solveVisible(tester);
       await tapVisible(tester, find.text('Kirim Jawaban'));
       await tapVisible(tester, find.text('Lihat Hasil'));

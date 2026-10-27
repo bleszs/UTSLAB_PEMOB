@@ -7,13 +7,16 @@ import '../models/question.dart';
 class QuizController extends ChangeNotifier {
   QuizController({
     required List<Question> questions,
+    List<Question> bonusQuestions = const [],
     DateTime Function()? now,
     this.timeLimit = const Duration(seconds: 90),
   }) : bank = List.unmodifiable(questions),
+       bonusBank = List.unmodifiable(bonusQuestions),
        _now = now ?? DateTime.now {
+    final all = [...bank, ...bonusBank];
     if (bank.isEmpty ||
-        bank.map((q) => q.id).toSet().length != bank.length ||
-        bank.any(
+        all.map((q) => q.id).toSet().length != all.length ||
+        all.any(
           (q) =>
               q.items.isEmpty ||
               q.items.map((i) => i.id).toSet().length != q.items.length ||
@@ -30,6 +33,7 @@ class QuizController extends ChangeNotifier {
     _questions = bank;
   }
   final List<Question> bank;
+  final List<Question> bonusBank;
   final DateTime Function() _now;
   final Duration timeLimit;
   late List<Question> _questions;
@@ -38,13 +42,14 @@ class QuizController extends ChangeNotifier {
   final Set<String> _hints = {};
   String _name = '';
   String _avatar = 'explorer';
-  String _sessionTitle = 'Maraton semua misi';
+  String _sessionTitle = 'Maraton Pilihan Ganda';
   GameMode _mode = GameMode.relaxed;
   int _index = 0;
   int _streak = 0;
   int _bestStreak = 0;
   bool _completed = false;
   bool _practice = false;
+  bool _bonus = false;
   bool _navigationPaused = false;
   bool _lifecyclePaused = false;
   bool soundEnabled = true;
@@ -59,6 +64,7 @@ class QuizController extends ChangeNotifier {
   String get sessionTitle => _sessionTitle;
   GameMode get mode => _mode;
   bool get practice => _practice;
+  bool get isBonus => _bonus;
   int get sessionNumber => _sessionNumber;
   int get index => _index;
   int get total => _questions.length;
@@ -112,6 +118,7 @@ class QuizController extends ChangeNotifier {
     _index = 0;
     _completed = false;
     _practice = false;
+    _bonus = false;
     _streak = 0;
     _bestStreak = 0;
     _name = trimmed;
@@ -120,13 +127,26 @@ class QuizController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void startMission({String? missionId, String title = 'Maraton semua misi'}) {
+  void startMission({
+    String? missionId,
+    String title = 'Maraton Pilihan Ganda',
+  }) {
     if (_name.isEmpty) throw StateError('Isi nama terlebih dahulu.');
     final selected = missionId == null
         ? bank
         : bank.where((q) => q.missionId == missionId).toList();
     if (selected.isEmpty) throw ArgumentError('Misi tidak ditemukan.');
+    _bonus = false;
     _begin(selected, title, practice: false);
+  }
+
+  void startBonus() {
+    if (_name.isEmpty) throw StateError('Isi nama terlebih dahulu.');
+    if (bonusBank.isEmpty) {
+      throw StateError('Bank puzzle bonus tidak tersedia.');
+    }
+    _bonus = true;
+    _begin(bonusBank, 'Zona Puzzle Bonus', practice: false);
   }
 
   void _begin(List<Question> selected, String title, {required bool practice}) {
@@ -294,6 +314,7 @@ class QuizController extends ChangeNotifier {
     _streak = 0;
     _bestStreak = 0;
     _practice = false;
+    _bonus = false;
     notifyListeners();
   }
 

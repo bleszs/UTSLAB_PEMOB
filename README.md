@@ -1,14 +1,11 @@
 # Quizora Quest
 
-Aplikasi **kuis pilihan ganda** berbasis Flutter untuk UTS Laboratorium Pemrograman Mobile. Pengguna memasukkan nama, menjawab soal, dan melihat skor akhir atas namanya.
+Quizora Quest adalah aplikasi edukasi berbasis Flutter yang mengajak pengguna menyelesaikan puzzle dan kuis melalui beberapa misi. Pengguna dapat memilih avatar dan mode permainan, mengerjakan tantangan, menggunakan petunjuk, melihat hasil, serta mempelajari kembali pembahasan jawaban.
 
-Kuis utama berisi **16 soal berbasis cerita kampus**, dibagi menjadi empat misi. Setiap soal memiliki **empat opsi A/B/C/D dan tepat satu jawaban benar**. Keunikan soal berasal dari analisis petunjuk, jadwal, dokumen, dan kode. Puzzle interaktif berada di zona bonus yang terpisah.
-
-## Identitas mahasiswa
 
 | Keterangan | Identitas |
 |---|---|
-| Nama | **Blessly Silaban** |
+| Nama | **Blessly Victory Deo Silaban** |
 | NIM | **241401060** |
 | Lab | **PM 5** |
 | Mata kuliah | Laboratorium Pemrograman Mobile |
@@ -18,7 +15,6 @@ Kuis utama berisi **16 soal berbasis cerita kampus**, dibagi menjadi empat misi.
 | Keterangan | Detail |
 |---|---|
 | Nama | Quizora Quest |
-| Versi | 3.0.0+3 |
 | Platform utama | Android |
 | Teknologi | Flutter / Dart |
 | Data | Lokal/dummy, tanpa database atau akun |
@@ -50,8 +46,6 @@ Akurasi dihitung dari jumlah benar dibagi jumlah soal, dibulatkan ke persen. Jaw
 
 ## Screenshot setiap halaman
 
-Gambar berikut diekspor dari **widget Flutter versi 3** melalui [generator screenshot](tool/capture_test.dart). Halaman panjang ditampilkan penuh pada lebar ponsel; pembahasan menampilkan bagian awal daftar yang dapat digulir. Nama **Ayu** merupakan data demonstrasi.
-
 | Halaman awal / profil | Pilihan misi | Kuis pilihan ganda |
 |---|---|---|
 | <img src="screenshots/01-welcome.png" width="220" alt="Halaman awal Quizora dengan input nama dan pilihan mode"> | <img src="screenshots/02-missions.png" width="220" alt="Empat misi pilihan ganda dan zona puzzle bonus terpisah"> | <img src="screenshots/03-quiz.png" width="220" alt="Soal cerita dengan empat opsi A B C D dan tombol kirim jawaban"> |
@@ -68,13 +62,9 @@ Contoh tampilan tambahan:
 
 [Feedback jawaban](screenshots/03-feedback.png) · [Teks diperbesar](screenshots/09-large-text.png) · [Zona bonus](screenshots/10-bonus.png) · [Timer](screenshots/11-timer.png)
 
-Bukti perangkat Android: [halaman awal APK 3.0.0 di BlueStacks](screenshots/12-android-bluestacks.png). Capture ini berasal dari jendela emulator yang menjalankan APK, berbeda dari capture widget di atas.
-
 ## Mockup / prototype
 
 [**Buka file desain dan prototype di Figma**](https://www.figma.com/design/2ojn6WerNvP5gRPTnFNVzK/Untitled?node-id=0-1)
-
-**Status:** file Figma online masih berupa draf versi sebelumnya. Sinkronisasi ke alur pilihan ganda versi 3 belum selesai karena batas kuota Figma MCP Starter. Screenshot di README ini berasal dari source aplikasi terbaru; keduanya tidak diklaim sudah sepenuhnya sama.
 
 ## Kredit dan sumber aset
 
@@ -85,8 +75,6 @@ Bukti perangkat Android: [halaman awal APK 3.0.0 di BlueStacks](screenshots/12-a
 | Ilustrasi edukasi | [education.png](assets/images/education.png), dibuat khusus untuk proyek melalui image generation OpenAI berdasarkan brief desain. |
 | Ilustrasi piala | [trophy.png](assets/images/trophy.png), dari ilustrasi proyek yang sama; mempertahankan warna ungu/kuning dan transparansi. |
 | Referensi visual awal | Brief dan mockup Gemini yang diberikan pengguna; referensi tersebut tidak disajikan sebagai screenshot hasil aplikasi. |
-
-Seluruh cerita, data, dan petunjuk kuis merupakan contoh fiksi untuk pembelajaran.
 
 ## Menjalankan dan membangun
 
@@ -126,4 +114,3 @@ screenshots/                       # Dokumentasi halaman versi terbaru
 
 `WelcomeScreen` dan `QuizScreen` memakai StatefulWidget; halaman misi, hasil, pembahasan, serta komponen presentasi memakai StatelessWidget sesuai kebutuhan. Satu QuizScreen dipakai untuk seluruh soal. ChangeNotifier dimiliki di atas navigasi sehingga rotasi tidak membuat ulang jawaban.
 
-Sesi disimpan di memori selama aplikasi berjalan. Menutup proses aplikasi atau me-reload web memulai sesi baru. APK debug dipakai untuk demonstrasi/pengujian; signing rilis distribusi resmi belum disiapkan.
